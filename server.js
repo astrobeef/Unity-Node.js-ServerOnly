@@ -2,18 +2,34 @@
 // ws://unity-node-game-server.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
 // https://unity-node-game-server.herokuapp.com/
 
-PORT = process.env.PORT || 80;
+PORT = process.env.PORT || 52300;
+DB_NAME = "unity-node-database";
 
-const app = require("express")();
+const express = require("express")
+const app = express();
 const server = require("http").Server(app);
 // const io = require('socket.io')(process.env.PORT || PORT);
 const io = require("socket.io")(server);
+const path = require("path");
+
+//Mongoose requires
+const mongojs = require("mongojs");
+const mongoose = require("mongoose");
+const logger = require("morgan");
 
 server.listen(PORT);
 
+// Define middleware here
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(logger("dev"));
+
+// Serve up static assets (usually on heroku)
+  app.use(express.static("client/build"));
+
 app.get("*", function(req, res){
     console.log("Hello");
-    res.send(200);
+    res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
 
 const Server = require("./Classes/Server");
@@ -57,3 +73,30 @@ function interval(func, pWait, pTimes) {
 
     setTimeout(iInterval, pWait);
 }
+
+/* ------------------ */
+/* ---- Database ---- */
+/* ------------------ */
+
+//Connect to database.
+mongoose.connect(process.env.MONGODB_URI || `mongodb://localhost/${DB_NAME}`, {
+    useNewUrlParser : true,
+    useFindAndModify: true
+});
+
+//Set up Mongo database.
+const databaseUrl = process.env.MONGODB_URI || DB_NAME;
+const collections = [DB_NAME];
+
+//Set reference to our database.
+// const db = mongojs(databaseUrl, collections);
+const db = require("./models"); 
+
+
+db.Test.create({name : "Test name", test : "test test"})
+.then(dbTest => {
+    console.log(dbTest);
+})
+.catch(({message}) => {
+    console.log(message);
+})
