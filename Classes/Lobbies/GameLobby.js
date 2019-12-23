@@ -185,7 +185,6 @@ module.exports = class GameLobby extends LobbyBase {
         const bullets = lobby.bullets;
         const connections = lobby.connections;
 
-        console.log(`Destroying bullet (${bullet.id})`);
         const index = bullets.indexOf(bullet);
         if (index > -1) {
             bullets.splice(index, 1);
