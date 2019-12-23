@@ -2,8 +2,20 @@
 // ws://unity-node-game-server.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
 // https://unity-node-game-server.herokuapp.com/
 
-PORT = process.env.PORT || 52300;
-const io = require('socket.io')(process.env.PORT || PORT);
+PORT = process.env.PORT || 80;
+
+const app = require("express")();
+const server = require("http").Server(app);
+// const io = require('socket.io')(process.env.PORT || PORT);
+const io = require("socket.io")(server);
+
+server.listen(PORT);
+
+app.get("*", function(req, res){
+    console.log("Hello");
+    res.send(200);
+});
+
 const Server = require("./Classes/Server");
 
 /*------------------------*/
@@ -12,16 +24,20 @@ const Server = require("./Classes/Server");
 
 console.log(`Server has started on http://localhost:${PORT}`);
 
-const server = new Server();
+const cServer = new Server();
 
 setInterval(() => {
-    server.onUpdate();
+    cServer.onUpdate();
 }, 100, 0);
 
 io.on("connection", function(socket){
-    const connection = server.onConnected(socket);
+    const connection = cServer.onConnected(socket);
     connection.createEvents();
     connection.socket.emit("register", {'id' : connection.player.id});
+    socket.emit("news", {hello : "world"});
+    socket.on("my other event", function (data){
+        console.log(data);
+    });
 });
 
 function interval(func, pWait, pTimes) {
