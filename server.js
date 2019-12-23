@@ -1,4 +1,4 @@
-PORT = 52300;
+PORT = process.env.PORT || 52300;
 const io = require('socket.io')(process.env.PORT || PORT);
 const Server = require("./Classes/Server");
 
