@@ -63,6 +63,8 @@ module.exports = class Server {
         server.lobbys[connection.player.lobby].onLeaveLobby(connection);
     }
 
+    
+
     onAttemptToJoinGame(connection = Connection){
         //Look through lobbies for a gameLobby
         //Check if joinable
