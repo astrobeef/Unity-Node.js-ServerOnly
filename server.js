@@ -1,3 +1,7 @@
+// ws://127.0.0.1:52300/socket.io/?EIO=4&transport=websocket
+// ws://unity-node-game-server.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
+// https://unity-node-game-server.herokuapp.com/
+
 PORT = process.env.PORT || 52300;
 const io = require('socket.io')(process.env.PORT || PORT);
 const Server = require("./Classes/Server");
