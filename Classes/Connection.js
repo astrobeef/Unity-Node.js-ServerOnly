@@ -4,6 +4,7 @@ module.exports = class Connection {
         this.player;
         this.server;
         this.lobby;
+        this.db;
     }
 
     //Handles all our io events and where we should route them to be handled
@@ -12,6 +13,12 @@ module.exports = class Connection {
         const socket = connection.socket;
         const server = connection.server;
         const player = connection.player;
+        if(this.db){
+            console.log("We have made a connection to our MongoDB");
+        }
+        else{
+            console.warn("We have not connected to our mongoDB");
+        }
 
         socket.on("disconnect", function(){
             server.onDisconnected(connection);
@@ -43,5 +50,41 @@ module.exports = class Connection {
 
             socket.broadcast.to(connection.lobby.id).emit("updateRotation", player);
         });
+
+        this.DB_checkRef(connection);
+    }
+
+    DB_checkRef(connection = Connection){
+        const db = connection.db;
+
+        console.log(`our connection_id is ${connection.player.id}`);
+
+        db.Player.find({connection_id : connection.player.id}, (err, data) => {
+            if(err) throw err;
+
+            if(data.length > 0){
+                console.log("Found reference to this player in our DB");
+            }
+            else{
+                console.log("No reference to this player in our DB... creating reference.");
+
+                this.DB_createRef(connection);
+            }
+        })
+    }
+
+    DB_createRef(connection = Connection){
+        const db = require("../models");
+
+        console.log(`Setting reference in our DB for the player ${connection.player.id}`);
+
+        db.Player.create({
+            connection_id: connection.player.id,
+            username: connection.player.username,
+            connected: true
+        }).then((data) => {
+            console.log(data);
+            console.log("created reference to the player");
+        })
     }
 }

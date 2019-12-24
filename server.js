@@ -25,14 +25,22 @@ app.use(express.json());
 app.use(logger("dev"));
 
 // Serve up static assets (usually on heroku)
-  app.use(express.static("client/build"));
+app.use(express.static("client/build"));
 
-app.get("*", function(req, res){
+const Server = require("./Classes/Server");
+
+/*------------------------*/
+/*--------Routing---------*/
+/*------------------------*/
+
+const routes = require("./routes");
+
+app.use(routes);
+
+app.get("*", function (req, res) {
     console.log("Hello");
     res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
-
-const Server = require("./Classes/Server");
 
 /*------------------------*/
 /*---- Custom Classes ----*/
@@ -46,12 +54,13 @@ setInterval(() => {
     cServer.onUpdate();
 }, 100, 0);
 
-io.on("connection", function(socket){
+io.on("connection", function (socket) {
     const connection = cServer.onConnected(socket);
+    connection.db = require("./models");
     connection.createEvents();
-    connection.socket.emit("register", {'id' : connection.player.id});
-    socket.emit("news", {hello : "world"});
-    socket.on("my other event", function (data){
+    connection.socket.emit("register", { 'id': connection.player.id });
+    socket.emit("news", { hello: "world" });
+    socket.on("my other event", function (data) {
         console.log(data);
     });
 });
@@ -80,7 +89,7 @@ function interval(func, pWait, pTimes) {
 
 //Connect to database.
 mongoose.connect(process.env.MONGODB_URI || `mongodb://localhost/${DB_NAME}`, {
-    useNewUrlParser : true,
+    useNewUrlParser: true,
     useFindAndModify: true
 });
 
@@ -90,13 +99,16 @@ const collections = [DB_NAME];
 
 //Set reference to our database.
 // const db = mongojs(databaseUrl, collections);
-const db = require("./models"); 
+const db = require("./models");
 
+// DB_WipeOnStart();
 
-db.Test.create({name : "Test name", test : "test test"})
-.then(dbTest => {
-    console.log(dbTest);
-})
-.catch(({message}) => {
-    console.log(message);
-})
+function DB_WipeOnStart() {
+    console.log(`!!! Wiping our MongoDB !!!`);
+
+    db.Player.remove({}, function (err, data) {
+        if (err) throw err;
+        console.log(`Removed Player collection from DB ...`);
+        console.log(data);
+    })
+}
