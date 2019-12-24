@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(logger("dev"));
 
 // Serve up static assets (usually on heroku)
-app.use(express.static("client/build"));
+app.use(express.static("web-client/build"));
 
 const Server = require("./Classes/Server");
 
@@ -39,7 +39,7 @@ app.use(routes);
 
 app.get("*", function (req, res) {
     console.log("Hello");
-    res.sendFile(path.join(__dirname, "./client/build/index.html"));
+    res.sendFile(path.join(__dirname, "./web-client/build/index.html"));
 });
 
 /*------------------------*/
