@@ -2,24 +2,38 @@
 // ws://unity-node-game-server.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
 // https://unity-node-game-server.herokuapp.com/
 
-PORT = process.env.PORT || 52300;
-DB_NAME = "unity-node-database";
+/*----------------*/
+/*Static Variables*/
+/*----------------*/
 
-const express = require("express")
-const app = express();
-const server = require("http").Server(app);
-// const io = require('socket.io')(process.env.PORT || PORT);
-const io = require("socket.io")(server);
-const path = require("path");
+PORT = process.env.PORT || 52300;       //If we are provided a port by a third party, then use that.  If not, use port 52300.
+DB_NAME = "unity-node-database";        //Specify the name of our mongoose database
+
+//File imports
+const Server = require("./Classes/Server");
+
+/*---------------*/
+/*--NPM Imports--*/
+/*---------------*/
+
+const express = require("express")                              //Import the 'express' npm package.  Used to establish server connections for web client.
+const app = express();                                          //Establish express server.
+
+const path = require("path");                                   //Import for file paths.
 
 //Mongoose requires
 const mongojs = require("mongojs");
 const mongoose = require("mongoose");
 const logger = require("morgan");
 
-server.listen(PORT);
+//---Connecting web server and game server to one port
+const server = require("http").Server(app);                     //Wrap our express server in an http server.  This will allow us to connect our game server and web server with sockets.
+const io = require("socket.io")(server);                        //Wrap our server in a socket element so we may use sockets to connect our servers.
 
-// Define middleware here
+/*--------------------*/
+/*Middleware functions*/
+/*--------------------*/
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(logger("dev"));
@@ -27,7 +41,12 @@ app.use(logger("dev"));
 // Serve up static assets (usually on heroku)
 app.use(express.static("web-client/build"));
 
-const Server = require("./Classes/Server");
+
+/*---------------------------*/
+/*Establish server connection*/
+/*---------------------------*/
+
+server.listen(PORT);        //Sets up our server to listen for events.
 
 /*------------------------*/
 /*--------Routing---------*/
@@ -35,11 +54,11 @@ const Server = require("./Classes/Server");
 
 const routes = require("./routes");
 
-app.use(routes);
+app.use(routes);        //Use our routes established in our 'routes' directory.
 
+// '*' catches all paths which are not caught previously.
 app.get("*", function (req, res) {
-    console.log("Hello");
-    res.sendFile(path.join(__dirname, "./web-client/build/index.html"));
+    res.sendFile(path.join(__dirname, "./web-client/build/index.html"));        //Respond to the route 'get' request with our React index.html file.  This can be accessed by specifiying our current directory, "__dirname"
 });
 
 /*------------------------*/
