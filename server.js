@@ -67,22 +67,38 @@ app.get("*", function (req, res) {
 
 console.log(`Server has started on http://localhost:${PORT}`);
 
-const cServer = new Server();
+const cServer = new Server();       //Create an instance of our 'Server' class
 
-setInterval(() => {
-    cServer.onUpdate();
+/*------------------------*/
+/*-------- Update --------*/
+/*------------------------*/
+
+setInterval(() => {         //Each 100ms, repeated infintely, do the following
+    cServer.onUpdate();         //Run the update method on our instanced 'Server' class
 }, 100, 0);
 
-io.on("connection", function (socket) {
-    const connection = cServer.onConnected(socket);
-    connection.db = require("./models");
-    connection.createEvents();
-    connection.socket.emit("register", { 'id': connection.player.id });
+/*------------------------*/
+/*-------- Socket --------*/
+/*------------------------*/
+
+//Upon a socket.io connection, do the following, passing in the 'socket' connection
+io.on("connection", function (socket/* The socket we've connected to */) {
+
+    const connection = cServer.onConnected(socket);             //Run the "onConnected" method on our server, passing in our 'socket' connection.  Establish a reference to the connection made with the socket.
+
+    connection.db = require("./models");                                    //Set a reference, for our connection, to our database.
+    connection.createEvents();                                              //Create the events for our connection.
+    connection.socket.emit("register", { 'id': connection.player.id });         //Register our connection with the ID of our player, found from our connection.
     socket.emit("news", { hello: "world" });
     socket.on("my other event", function (data) {
         console.log(data);
     });
 });
+
+/*-------------------------*/
+/*-------- Methods --------*/
+/*-------------------------*/
+
 
 function interval(func, pWait, pTimes) {
     const iInterval = function (iWait, iTimes) {
