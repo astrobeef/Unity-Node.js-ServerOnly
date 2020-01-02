@@ -5,7 +5,6 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-<<<<<<< HEAD
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:prod": "node server.js",
     "start:dev": "concurrently \"nodemon --ignore 'web-client/*'\" \"npm run web-client\"",
@@ -13,10 +12,6 @@
     "install": "cd web-client && npm install",
     "build": "cd web-client && npm run build",
     "heroku-postbuild": "npm run build"
-=======
-    "start" : "node server.js"
-
->>>>>>> 21641e344f52146ebed7ab1440c5db005ac65a26
   },
   "author": "Brian Graf (AstroBeef)",
   "license": "ISC",

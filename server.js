@@ -136,10 +136,10 @@ const collections = [DB_NAME];
 // const db = mongojs(databaseUrl, collections);
 const db = require("./models");
 
-// DB_WipeOnStart();
+DB_WipeOnStart();
 
 function DB_WipeOnStart() {
-    console.log(`!!! Wiping our MongoDB !!!`);
+    console.warn(`!!! Wiping our MongoDB !!!`);
 
     db.Player.remove({}, function (err, data) {
         if (err) throw err;

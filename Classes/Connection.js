@@ -51,35 +51,52 @@ module.exports = class Connection {
             socket.broadcast.to(connection.lobby.id).emit("updateRotation", player);
         });
 
-        this.DB_checkRef(connection);
+        //If we do NOT have a DB reference, create one.
+        if(!this.DB_checkRef(connection, connection.player.id)){
+            this.DB_createRef(connection);
+        }
     }
 
-    DB_checkRef(connection = Connection){
+    /**
+     * This checks if our MongoDB has a stored reference of this connection
+     * @param {Connection} connection - Our connection
+     * @param {String} playerID - The ID of our connected player (connection.player.id)
+     * @returns - Returns true if this connection exists within the Database, false if not
+     */
+    DB_checkRef(connection = Connection, playerID = String){
         const db = connection.db;
 
-        console.log(`our connection_id is ${connection.player.id}`);
+        console.log(`our connection_id is ${playerID}`);
 
-        db.Player.find({connection_id : connection.player.id}, (err, data) => {
+        db.Player.find({connection_id : playerID}, (err, data) => {
             if(err) throw err;
 
             if(data.length > 0){
                 console.log("Found reference to this player in our DB");
+
+                return true;
             }
             else{
-                console.log("No reference to this player in our DB... creating reference.");
+                console.log("No reference to this player in our DB...");
 
-                this.DB_createRef(connection);
+                return false;
             }
         })
     }
 
-    DB_createRef(connection = Connection){
+
+    /**
+     * This creates a reference to our Mongo DB for this connection, based on the player's ID
+     * @param {Connection} connection - Our connection
+     * @param {String} playerID - The ID of our connected player (connection.player.id)
+     */
+    DB_createRef(connection = Connection, playerID = String){
         const db = require("../models");
 
-        console.log(`Setting reference in our DB for the player ${connection.player.id}`);
+        console.log(`Setting reference in our DB for the player ${playerID}`);
 
         db.Player.create({
-            connection_id: connection.player.id,
+            connection_id: playerID,
             username: connection.player.username,
             connected: true
         }).then((data) => {
