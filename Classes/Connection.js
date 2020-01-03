@@ -53,7 +53,7 @@ module.exports = class Connection {
 
         //If we do NOT have a DB reference, create one.
         if(!this.DB_checkRef(connection, connection.player.id)){
-            this.DB_createRef(connection);
+            this.DB_createRef(connection, connection.player.id);
         }
     }
 
