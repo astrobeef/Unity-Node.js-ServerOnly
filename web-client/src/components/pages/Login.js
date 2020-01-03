@@ -4,9 +4,6 @@ function Login(props) {
 
   const isRegistered = checkIfRegistered();      //A boolean value whether the user has registered or not.
 
-  console.log(props);
-  console.log("props");
-
   return (
     <div className="App">
       <header className="App-header">

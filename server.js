@@ -89,10 +89,10 @@ io.on("connection", function (socket/* The socket we've connected to */) {
     connection.db = require("./models");                                    //Set a reference, for our connection, to our database.
     connection.createEvents();                                              //Create the events for our connection.
     connection.socket.emit("register", { 'id': connection.player.id });         //Register our connection with the ID of our player, found from our connection.
-    socket.emit("news", { hello: "world" });
-    socket.on("my other event", function (data) {
-        console.log(data);
-    });
+    // socket.emit("news", { hello: "world" });
+    // socket.on("my other event", function (data) {
+    //     console.log(data);
+    // });
 });
 
 /*-------------------------*/

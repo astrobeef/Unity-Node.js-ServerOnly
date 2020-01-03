@@ -4,12 +4,8 @@ import { Link } from "react-router-dom";
 function Data(props) {
 
   useEffect(() => {
-    console.log("data effect");
     props.DB_getPlayers();
   }, []);
-
-  console.log(props);
-  console.log("props");
 
   return (
     <div className="App">

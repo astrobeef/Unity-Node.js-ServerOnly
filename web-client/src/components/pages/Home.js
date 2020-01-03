@@ -2,8 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function Home(props) {
-    console.log(props);
-    console.log("props");
 
     return (
         <div className="App">

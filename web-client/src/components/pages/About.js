@@ -3,9 +3,6 @@ import { Link } from "react-router-dom";
 
 function About(props) {
 
-  console.log(props);
-  console.log("props");
-
   return (
     <div className="App">
       <header className="App-header">

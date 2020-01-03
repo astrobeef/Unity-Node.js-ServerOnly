@@ -45,9 +45,6 @@ function App() {
   function DB_getPlayers() {
     API.getPlayers()
       .then(db_players => {
-        console.log("vvvvv db_players vvvvv");
-        console.log(db_players);
-        console.log("^^^^^ db_players ^^^^^");
         setPlayers(db_players);
       }
       )

@@ -5,9 +5,6 @@ function Play(props) {
 
   const hasDownloaded = checkHasDownloaded();
 
-  console.log(props);
-  console.log("props");
-
   return (
     <div className="App">
       <header className="App-header">
