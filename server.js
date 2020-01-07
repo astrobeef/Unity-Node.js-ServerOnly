@@ -39,7 +39,7 @@ app.use(express.json());
 app.use(logger("dev"));
 
 // Serve up static assets (usually on heroku)
-app.use(express.static("web-client/build"));
+app.use(express.static("client/build"));
 
 
 /*---------------------------*/
@@ -58,7 +58,7 @@ app.use(routes);        //Use our routes established in our 'routes' directory.
 
 // '*' catches all paths which are not caught previously.
 app.get("*", function (req, res) {
-    res.sendFile(path.join(__dirname, "./web-client/build/index.html"));        //Respond to the route 'get' request with our React index.html file.  This can be accessed by specifiying our current directory, "__dirname"
+    res.sendFile(path.join(__dirname, "./client/build/index.html"));        //Respond to the route 'get' request with our React index.html file.  This can be accessed by specifiying our current directory, "__dirname"
 });
 
 /*------------------------*/

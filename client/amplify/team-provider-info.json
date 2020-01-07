@@ -1,0 +1,29 @@
+{
+    "local": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-unitynodeauth-local-130429-authRole",
+            "UnauthRoleArn": "arn:aws:iam::658095472941:role/amplify-unitynodeauth-local-130429-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::658095472941:role/amplify-unitynodeauth-local-130429-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "amplify-unitynodeauth-local-130429-deployment",
+            "UnauthRoleName": "amplify-unitynodeauth-local-130429-unauthRole",
+            "StackName": "amplify-unitynodeauth-local-130429",
+            "StackId": "arn:aws:cloudformation:us-west-2:658095472941:stack/amplify-unitynodeauth-local-130429/ef532ba0-3188-11ea-b876-0a06032da4ca",
+            "AmplifyAppId": "d1pmhmz5aztwtk"
+        },
+        "categories": {
+            "function": {
+                "unitynodeauth9f7ddbe2CustomMessage": {
+                    "REDIRECTURL": "http://localhost:3000/home",
+                    "EMAILSUBJECT": "AstroBeef - Confirmation Email",
+                    "EMAILMESSAGE": "Thank you for joining this project"
+                }
+            },
+            "auth": {
+                "unitynodeauth9f7ddbe2": {
+                    "hostedUIProviderCreds": "[]"
+                }
+            }
+        }
+    }
+}

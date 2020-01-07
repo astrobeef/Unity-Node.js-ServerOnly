@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-// import logo from './logo.svg';
+import logo from './logo.svg';
+
 import './App.css';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+
+//Autho
+import { Auth } from "aws-amplify";
 
 import Home from "./components/pages/Home";
 import Login from "./components/pages/Login";
@@ -34,6 +38,8 @@ function App() {
   return (
 
     <Router>
+      <button onClick={() => Auth.federatedSignIn()}>Sign In</button>
+
       <NavTabs />
       <Route exact path="/">
         {/* Redirect to login if the user is not logged in.  Else, redirect home */}
@@ -135,7 +141,7 @@ function App() {
 
       alert("You're logged in!");
 
-      
+
 
     }
     else {
