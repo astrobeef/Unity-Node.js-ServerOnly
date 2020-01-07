@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 function Login(props) {
 
@@ -58,7 +59,8 @@ function Login(props) {
                 <input type="password" className="form-control" id="password-confirm" placeholder="Confirm Password" name="password-confirm" onChange={props.handleInputChange}></input>
               </div>
 
-              <button type="submit" value="Submit" onClick={props.handleSubmit}>Submit</button>
+              <button type="submit" value="Submit" onClick={props.handleSubmit}><Link to="/home" className={window.location.pathname === "/home" ? "nav-link active" : "nav-link"}>Submit
+        </Link></button>
 
             </form>
           </div>

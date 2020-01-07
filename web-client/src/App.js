@@ -37,15 +37,15 @@ function App() {
       <NavTabs />
       <Route exact path="/">
         {/* Redirect to login if the user is not logged in.  Else, redirect home */}
-        {isLoggedIn ? <Redirect to="/home" /> : <Redirect to="/login" />}
+        {<Redirect to="/login" />}
       </Route>
 
-    <Route exact path = "/login">
-      {isLoggedIn ? <Redirect to = "/home" /> : <Redirect to="/login"></Redirect>}
+      <Route exact path="/login">
+        {isLoggedIn ? <Redirect to="/home" /> : <Redirect to="/login"></Redirect>}
 
-    </Route>
+      </Route>
 
-      <Route exact path="/login" render={(props) => <Login {...props} handleInputChange={handleLoginInputChange} handleSubmit={handleLoginSubmit}/>} />
+      <Route exact path="/login" render={(props) => <Login {...props} handleInputChange={handleLoginInputChange} handleSubmit={handleLoginSubmit} />} />
       <Route exact path="/home" render={(props) => <Home {...props} />} />
       <Route exact path="/play" render={(props) => <Play {...props} />} />
       <Route exact path="/data" render={(props) => <Data {...props} players={players} displayPlayers={displayPlayers} DB_getPlayers={DB_getPlayers} />} />
@@ -132,6 +132,10 @@ function App() {
       //We do not store the password, only the email.
       sessionStorage.setItem(login.name, JSON.stringify(login_lessPassword));
       localStorage.setItem(login.name, JSON.stringify(login_lessPassword));
+
+      alert("You're logged in!");
+
+      
 
     }
     else {
