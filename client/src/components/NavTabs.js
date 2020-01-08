@@ -1,7 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function NavTabs() {
+function NavTabs(props) {
+
+    console.log(props);
+
     return (
         <ul className="nav nav-tabs">
             <li className="nav-item">
@@ -9,11 +12,13 @@ function NavTabs() {
                     Home
         </Link>
             </li>
-            <li className="nav-item">
-                <Link to="/" className={window.location.pathname === "/" ? "nav-link active" : "nav-link"}>
-                    Login/Register
+            {props.isLoggedIn ? null :
+                <li className="nav-item">
+                    <Link to="/login" className={window.location.pathname === "/login" ? "nav-link active" : "nav-link"}>
+                        Login/Register
         </Link>
-            </li>
+                </li>
+            }
             <li className="nav-item">
                 <Link to="/play" className={window.location.pathname === "/play" ? "nav-link active" : "nav-link"}>
                     Play/Download

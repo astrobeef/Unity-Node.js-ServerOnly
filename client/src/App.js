@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
+import { Auth } from "aws-amplify";
 
 import './App.css';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
-
-//Autho
-import { Auth } from "aws-amplify";
 
 import Home from "./components/pages/Home";
 import Login from "./components/pages/Login";
@@ -19,18 +16,21 @@ import NavTabs from './components/NavTabs';
 
 function App() {
 
-  const [isLoggedIn, setIsLoggedIn] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState([]);           //A boolean value whether the user is logged in or not.
+  const [isRegistered, setIsRegistered] = useState([]);       //A boolean value whether the user has registered or not.
 
   const [players, setPlayers] = useState([]);
 
   const [login, setLogin] = useState([]);
 
   useEffect(() => {
+    if (!isRegistered) setIsRegistered(checkIfRegistered());
+
     setLogin({
       name: "login"
     });
 
-    setIsLoggedIn(checkIfLoggedIn());
+    AUTHO_checkUser();
   }, []);
 
 
@@ -38,24 +38,14 @@ function App() {
   return (
 
     <Router>
-      <button onClick={() => Auth.federatedSignIn()}>Sign In</button>
 
-      <NavTabs />
-      <Route exact path="/">
-        {/* Redirect to login if the user is not logged in.  Else, redirect home */}
-        {<Redirect to="/login" />}
-      </Route>
-
-      <Route exact path="/login">
-        {isLoggedIn ? <Redirect to="/home" /> : <Redirect to="/login"></Redirect>}
-
-      </Route>
-
-      <Route exact path="/login" render={(props) => <Login {...props} handleInputChange={handleLoginInputChange} handleSubmit={handleLoginSubmit} />} />
-      <Route exact path="/home" render={(props) => <Home {...props} />} />
+      <NavTabs isLoggedIn={isLoggedIn ? true : false} />
+      <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} handleInputChange={handleLoginInputChange} />} />
+      <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut} />} />
       <Route exact path="/play" render={(props) => <Play {...props} />} />
       <Route exact path="/data" render={(props) => <Data {...props} players={players} displayPlayers={displayPlayers} DB_getPlayers={DB_getPlayers} />} />
       <Route exact path="/about" render={(props) => <About {...props} />} />
+      <Route path="*" render={(props) => isLoggedIn ? <Redirect to="/home"></Redirect> : <Redirect to="/login"></Redirect>} />
     </Router>
 
   );
@@ -88,23 +78,6 @@ function App() {
   }
 
   /**
-   * Checks if the user is logged in
-   * @returns true if the user is logged in, false if not.
-   */
-  function checkIfLoggedIn() {
-    const retrievedStorage = sessionStorage.getItem("login");
-    console.log("Getting session login..." + retrievedStorage);
-
-    //If we find data with the name 'login', then the user is logged in.
-    if (retrievedStorage) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  /**
    * Updates the state of the login based on the input name and value
    * @param {Object} event - If an object, the change event fired when the input value is changed.
    * @param {String} event - If a string, the value to be set to the email.
@@ -120,45 +93,92 @@ function App() {
     console.log(login);
   }
 
-  /**
-   * This event handles login submits, sending the login information to the session storage.
-   * @param {Object} event - The submit event fired.
-   */
-  function handleLoginSubmit(event) {
+  //AWS Autho
+
+  function AUTHO_signIn(event) {
     event.preventDefault();
 
-    if (checkAutho()) {
-      console.log("storing to session storage...");
+    if (isRegistered) {
       console.log(login);
 
-      const login_lessPassword = login;
-      delete login_lessPassword["password"];
-      delete login_lessPassword["password-confirm"];
+      if (login) {
+        if (login.username) {
+          const username = login.username;
+          const password = login.password;
 
-      //We do not store the password, only the email.
-      sessionStorage.setItem(login.name, JSON.stringify(login_lessPassword));
-      localStorage.setItem(login.name, JSON.stringify(login_lessPassword));
-
-      alert("You're logged in!");
-
-
-
+          Auth.signIn(username, password)
+            .then(user => {
+              AUTHO_ValidateUser(username);
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        }
+      }
     }
     else {
-      console.log("User not authorized...");
-      alert("You are not authorized");
+      Auth.federatedSignIn();
     }
+  }
 
+  function AUTHO_signOut() {
+    Auth.signOut()
+      .then(data => {
+        console.log("successfully signed out");
+
+        //Remove our login registration from the session storage.
+        localStorage.removeItem("registered");
+        setIsLoggedIn(false);
+      })
+      .catch(err => console.log(err))
   }
 
   /**
-   * @returns true if the user login is authorized.
+   * This runs with App.js
+   * Checks if there is a user logged in.  If yes, then register the user to the local storage.
    */
-  function checkAutho() {
-    return true;
+  function AUTHO_checkUser() {
+    Auth.currentAuthenticatedUser()
+      .then(user => {
+        //User IS logged in.
+        AUTHO_ValidateUser(user.username);
+      })
+      .catch(err => {
+        setIsLoggedIn(false);
+        //User is NOT logged in.
+        console.warn(err);
+        setIsLoggedIn(false);
+      })
   }
 
-  
+  function AUTHO_ValidateUser(username) {
+    setIsLoggedIn(true);
+
+    if (!isRegistered) {
+      setIsRegistered(true);
+
+      localStorage.setItem("registered", username);
+    }
+  }
+
+  /**
+   * Checks if the user is logged in by checking the local storage.
+   * @returns true if the user is logged in, false if not.
+   */
+  function checkIfRegistered() {
+    console.log("checking for registered user...");
+
+    const localLogin = localStorage.getItem("registered");
+
+    if (localLogin) {
+      console.log(`Found a login with the username of : ${localLogin}`);
+      return true;
+    }
+    else {
+      console.log(`Could not find login stored in local storage`);
+      return false;
+    }
+  }
 }
 
 export default App;

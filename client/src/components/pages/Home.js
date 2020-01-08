@@ -27,6 +27,10 @@ function Home(props) {
                     </button>
 
 
+                    <button type="button" className="btn btn-primary" onClick={props.signOut}>
+                        Sign Out
+                    </button>
+
 
             </header>
         </div>
