@@ -14,6 +14,8 @@ import API from "./utils/API";
 import NavTabs from './components/NavTabs';
 // import { ConnectionBase } from 'mongoose';
 
+const CACHE_NAME = "static-cache-v2";
+
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState([]);           //A boolean value whether the user is logged in or not.
@@ -31,7 +33,7 @@ function App() {
     AUTHO_checkUser();
   }, []);
 
-
+  unzipGame();
 
   return (
 
@@ -40,14 +42,27 @@ function App() {
       <NavTabs isLoggedIn={isLoggedIn ? true : false} />
       <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} handleInputChange={handleLoginInputChange} />} />
       <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut} />} />
-      <Route exact path="/play" render={(props) => <Play {...props} />} />
+      <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload}/>} />
       <Route exact path="/data" render={(props) => <Data {...props} players={players} displayPlayers={displayPlayers} DB_getPlayers={DB_getPlayers} />} />
       <Route exact path="/about" render={(props) => <About {...props} />} />
+
       <Route path="*" render={(props) => isLoggedIn ? <Redirect to="/home"></Redirect> : <Redirect to="/login"></Redirect>} />
     </Router>
 
   );
 
+  function unzipGame(){
+    console.log("-".repeat(60));
+    console.log("PROMPT : attempting to unzip game file...");
+    caches.open(CACHE_NAME).then(cache => {
+      cache.matchAll("/assets/game-builds/buildv1.1.rar", {}).then(function(response){
+        console.log(response);
+      })
+    })
+    console.log("-".repeat(60));
+
+
+  }
 
   function DB_getPlayers() {
     API.getPlayers()
@@ -89,6 +104,10 @@ function App() {
     setLogin({ ...login, [name]: value });
 
     console.log(login);
+  }
+
+  function handleDownload(event){
+    console.log("handling download");
   }
 
   //AWS Autho

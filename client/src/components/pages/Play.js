@@ -17,8 +17,8 @@ function Play(props) {
           <button type="button" className="btn btn-warning my-2">
             Play
       </button> :     //Else, prompt the user to download the game.
-          <button type="button" className="btn btn-warning my-2">
-            Download
+          <button onClick = {props.handleDownload} type="button" className="btn btn-warning my-2">
+                <Link to="/assets/game-builds/buildv1.1.rar" className={window.location.pathname === "/assets/game-builds/buildv1.1.rar" ? "nav-link active" : "nav-link"}>Download</Link>
       </button>}
 
         <button type="button" className="btn btn-primary my-2">
