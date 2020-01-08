@@ -1,26 +1,9 @@
 {
-	"function": {
-		"unitynodeauth9f7ddbe2CustomMessage": {
-			"service": "Lambda",
-			"providerPlugin": "awscloudformation",
-			"build": true
-		}
-	},
 	"auth": {
-		"unitynodeauth9f7ddbe2": {
+		"unitynodeauth8acddaf0": {
 			"service": "Cognito",
 			"providerPlugin": "awscloudformation",
-			"dependsOn": [
-				{
-					"category": "function",
-					"resourceName": "unitynodeauth9f7ddbe2CustomMessage",
-					"triggerProvider": "Cognito",
-					"attributes": [
-						"Arn",
-						"Name"
-					]
-				}
-			]
+			"dependsOn": []
 		}
 	}
 }

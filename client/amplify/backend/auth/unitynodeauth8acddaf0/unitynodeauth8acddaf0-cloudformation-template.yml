@@ -9,18 +9,6 @@ Parameters:
     Type: String
   
   
-  
-  
-  functionunitynodeauth9f7ddbe2CustomMessageArn: 
-    Type: String
-    Default: functionunitynodeauth9f7ddbe2CustomMessageArn
-  
-  functionunitynodeauth9f7ddbe2CustomMessageName: 
-    Type: String
-    Default: functionunitynodeauth9f7ddbe2CustomMessageName
-  
-  
-  
 
     
   identityPoolName:
@@ -118,10 +106,7 @@ Parameters:
                       
   userPoolGroupList:
     Type: CommaDelimitedList
-                  
-  verificationBucketName:
-    Type: String
-                    
+                        
   parentStack:
     Type: String
                 
@@ -136,34 +121,13 @@ Conditions:
 
 Resources:
   
-  CustomMessageConfirmationBucket:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: "Retain"
-    Properties:
-      BucketName:  !If [ShouldNotCreateEnvResources, !Ref verificationBucketName, !Join ['',[!Ref verificationBucketName, '-', !Ref env]]]
-      AccessControl: "Private"
-      WebsiteConfiguration:
-        IndexDocument: "index.html"
-        ErrorDocument: "index.html"
-      CorsConfiguration:
-        CorsRules:
-          - 
-            AllowedHeaders:
-              - "Authorization" 
-              - "Content-Length"
-            AllowedMethods:
-              - "GET"
-            AllowedOrigins:
-              - "*"
-            MaxAge: 3000
-  
   
   # BEGIN SNS ROLE RESOURCE
   SNSRole: 
   # Created to allow the UserPool SMS Config to publish via the Simple Notification Service during MFA Process
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !If [ShouldNotCreateEnvResources, 'unityn9f7ddbe2_sns-role', !Join ['',[ 'sns', !Select [3, !Split ['-', !Ref 'AWS::StackName']], '-', !Ref env]]]
+      RoleName: !If [ShouldNotCreateEnvResources, 'unityn8acddaf0_sns-role', !Join ['',[ 'sns', !Select [3, !Split ['-', !Ref 'AWS::StackName']], '-', !Ref env]]]
       AssumeRolePolicyDocument: 
         Version: "2012-10-17"
         Statement: 
@@ -175,10 +139,10 @@ Resources:
               - "sts:AssumeRole"
             Condition: 
               StringEquals:
-                sts:ExternalId: unityn9f7ddbe2_role_external_id
+                sts:ExternalId: unityn8acddaf0_role_external_id
       Policies: 
         - 
-          PolicyName: unityn9f7ddbe2-sns-policy
+          PolicyName: unityn8acddaf0-sns-policy
           PolicyDocument: 
             Version: "2012-10-17"
             Statement: 
@@ -205,19 +169,6 @@ Resources:
         
       
       
-      LambdaConfig:
-        
-        
-          CustomMessage: !Ref functionunitynodeauth9f7ddbe2CustomMessageArn
-        
-        
-        
-        
-        
-        
-        
-        
-      
       
       AutoVerifiedAttributes: !Ref autoVerifiedAttributes
       
@@ -237,19 +188,10 @@ Resources:
       SmsVerificationMessage: !Ref smsVerificationMessage
       SmsConfiguration: 
         SnsCallerArn: !GetAtt SNSRole.Arn
-        ExternalId: unityn9f7ddbe2_role_external_id
+        ExternalId: unityn8acddaf0_role_external_id
     
   
     
-  
-  UserPoolCustomMessageLambdaInvokePermission: 
-    Type: "AWS::Lambda::Permission"
-    DependsOn: UserPool
-    Properties: 
-      Action: "lambda:invokeFunction"
-      Principal: "cognito-idp.amazonaws.com"
-      FunctionName: !Ref functionunitynodeauth9f7ddbe2CustomMessageName
-      SourceArn: !GetAtt UserPool.Arn
     
   
     
@@ -266,7 +208,7 @@ Resources:
   # Depends on UserPool for ID reference
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
-      ClientName: unityn9f7ddbe2_app_clientWeb
+      ClientName: unityn8acddaf0_app_clientWeb
       
       RefreshTokenValidity: !Ref userpoolClientRefreshTokenValidity
       UserPoolId: !Ref UserPool
@@ -276,7 +218,7 @@ Resources:
   # Depends on UserPool for ID reference
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
-      ClientName: unityn9f7ddbe2_app_client
+      ClientName: unityn8acddaf0_app_client
       
       GenerateSecret: !Ref userpoolClientGenerateSecret
       RefreshTokenValidity: !Ref userpoolClientRefreshTokenValidity
@@ -341,7 +283,7 @@ Resources:
   # Marked as depending on UserPoolClientRole for easier to understand CFN sequencing
     Type: 'AWS::IAM::Policy'
     Properties:
-      PolicyName: unityn9f7ddbe2_userpoolclient_lambda_iam_policy
+      PolicyName: unityn8acddaf0_userpoolclient_lambda_iam_policy
       Roles: 
         - !Ref UserPoolClientRole
       PolicyDocument:
@@ -358,7 +300,7 @@ Resources:
   # Marked as depending on UserPoolClientLambdaPolicy for easier to understand CFN sequencing
     Type: 'AWS::IAM::Policy'
     Properties:
-      PolicyName: unityn9f7ddbe2_userpoolclient_lambda_log_policy
+      PolicyName: unityn8acddaf0_userpoolclient_lambda_log_policy
       Roles: 
         - !Ref UserPoolClientRole
       PolicyDocument:
@@ -745,7 +687,7 @@ Resources:
   # Always created
     Type: AWS::Cognito::IdentityPool
     Properties: 
-      IdentityPoolName: !If [ShouldNotCreateEnvResources, 'unitynodeauth9f7ddbe2_identitypool_9f7ddbe2', !Join ['',['unitynodeauth9f7ddbe2_identitypool_9f7ddbe2', '__', !Ref env]]]
+      IdentityPoolName: !If [ShouldNotCreateEnvResources, 'unitynodeauth8acddaf0_identitypool_8acddaf0', !Join ['',['unitynodeauth8acddaf0_identitypool_8acddaf0', '__', !Ref env]]]
       
       CognitoIdentityProviders:
         - ClientId:  !Ref UserPoolClient

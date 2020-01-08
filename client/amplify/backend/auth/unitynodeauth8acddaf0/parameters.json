@@ -1,8 +1,8 @@
 {
-    "identityPoolName": "unitynodeauth9f7ddbe2_identitypool_9f7ddbe2",
+    "identityPoolName": "unitynodeauth8acddaf0_identitypool_8acddaf0",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "unityn9f7ddbe2",
-    "userPoolName": "unitynodeauth9f7ddbe2_userpool_9f7ddbe2",
+    "resourceNameTruncated": "unityn8acddaf0",
+    "userPoolName": "unitynodeauth8acddaf0_userpool_8acddaf0",
     "autoVerifiedAttributes": [
         "email"
     ],
@@ -28,9 +28,9 @@
     "userpoolClientReadAttributes": [
         "email"
     ],
-    "userpoolClientLambdaRole": "unityn9f7ddbe2_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "unityn8acddaf0_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "resourceName": "unitynodeauth9f7ddbe2",
+    "resourceName": "unitynodeauth8acddaf0",
     "authSelections": "identityPoolAndUserPool",
     "authRoleArn": {
         "Fn::GetAtt": [
@@ -46,26 +46,15 @@
     },
     "useDefault": "defaultSocial",
     "hostedUI": true,
-    // "triggers": "{\"CustomMessage\":[\"verification-link\"]}",
-    "hostedUIDomainName": "unitynodeauth9f7ddbe2-9f7ddbe2",
+    "triggers": "{}",
+    "hostedUIDomainName": "unitynodeauth8acddaf0-8acddaf0",
     "authProvidersUserPool": [],
     "hostedUIProviderMeta": "[]",
     "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"http://localhost:3000/\"],\"LogoutURLs\":[\"http://localhost:3000/\"]}",
     "userPoolGroupList": [],
-    "verificationBucketName": "unitynodeauth9f7ddbe2verificationbucket",
     "parentStack": {
         "Ref": "AWS::StackId"
     },
     "permissions": [],
-    "dependsOn": [
-        {
-            "category": "function",
-            "resourceName": "unitynodeauth9f7ddbe2CustomMessage",
-            "triggerProvider": "Cognito",
-            "attributes": [
-                "Arn",
-                "Name"
-            ]
-        }
-    ]
+    "dependsOn": []
 }
