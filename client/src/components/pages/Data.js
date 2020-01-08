@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 function Data(props) {
 
-  useEffect((props) => {
+  useEffect(() => {
     props.DB_getPlayers();
   }, []);
 

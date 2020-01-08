@@ -17,18 +17,16 @@ import NavTabs from './components/NavTabs';
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState([]);           //A boolean value whether the user is logged in or not.
-  const [isRegistered, setIsRegistered] = useState([]);       //A boolean value whether the user has registered or not.
+  const [isRegistered, setIsRegistered] = useState(false);       //A boolean value whether the user has registered or not.
 
   const [players, setPlayers] = useState([]);
 
-  const [login, setLogin] = useState([]);
+  const [login, setLogin] = useState({ name: "login" });
 
   useEffect(() => {
-    if (!isRegistered) setIsRegistered(checkIfRegistered());
 
-    setLogin({
-      name: "login"
-    });
+    console.log("-".repeat(60));
+    console.log("PROMPT : We are not logged in.  We should check if the user is logged in.");
 
     AUTHO_checkUser();
   }, []);
@@ -106,9 +104,13 @@ function App() {
           const username = login.username;
           const password = login.password;
 
+          console.log("signing in");
+
           Auth.signIn(username, password)
             .then(user => {
-              AUTHO_ValidateUser(username);
+              console.log("Successfully signed in");
+              AUTHO_RegisterUser(username);
+              setIsLoggedIn(true);
             })
             .catch(err => {
               console.log(err);
@@ -126,8 +128,6 @@ function App() {
       .then(data => {
         console.log("successfully signed out");
 
-        //Remove our login registration from the session storage.
-        localStorage.removeItem("registered");
         setIsLoggedIn(false);
       })
       .catch(err => console.log(err))
@@ -138,26 +138,57 @@ function App() {
    * Checks if there is a user logged in.  If yes, then register the user to the local storage.
    */
   function AUTHO_checkUser() {
+
     Auth.currentAuthenticatedUser()
       .then(user => {
         //User IS logged in.
-        AUTHO_ValidateUser(user.username);
+        AUTHO_RegisterUser(user.username);
+
+        console.log("RESULT : User is logged in");
+        console.log("-".repeat(60));
+
+        //If our state is not already set to true, then...
+        if (isLoggedIn !== true) {
+          setIsLoggedIn(true);
+          console.log("Changed isLoggedIn from false to true");
+        }
+
+        if (isRegistered !== true) {
+          console.log("-".repeat(60));
+          console.log("PROMPT : We are not registered.  We should check if the user is registered");
+
+          checkIfRegistered();
+          console.log("-".repeat(60));
+        }
       })
       .catch(err => {
-        setIsLoggedIn(false);
         //User is NOT logged in.
-        console.warn(err);
-        setIsLoggedIn(false);
+        console.log(err);
+
+        console.log("RESULT : User is NOT logged in");
+        console.log("-".repeat(60));
+
+        //If our state is not already set to false, then...
+        if (isLoggedIn !== false) {
+          setIsLoggedIn(false);
+          console.log("Changed isLoggedIn from true to false");
+        }
+        
+
+        if (isRegistered !== true) {
+          console.log("-".repeat(60));
+          console.log("PROMPT : We are not registered.  We should check if the user is registered");
+
+          checkIfRegistered();
+          console.log("-".repeat(60));
+        }
       })
   }
 
-  function AUTHO_ValidateUser(username) {
-    setIsLoggedIn(true);
-
+  function AUTHO_RegisterUser(username) {
     if (!isRegistered) {
-      setIsRegistered(true);
-
       localStorage.setItem("registered", username);
+      setIsRegistered(true);
     }
   }
 
@@ -171,12 +202,12 @@ function App() {
     const localLogin = localStorage.getItem("registered");
 
     if (localLogin) {
-      console.log(`Found a login with the username of : ${localLogin}`);
-      return true;
+      console.log(`RESULT : Found a login with the username of : ${localLogin}`);
+      setIsRegistered(true);
     }
     else {
-      console.log(`Could not find login stored in local storage`);
-      return false;
+      console.log(`RESULT : Could not find registration stored in local storage`);
+      setIsRegistered(false);
     }
   }
 }

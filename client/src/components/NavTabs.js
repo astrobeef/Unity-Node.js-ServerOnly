@@ -5,8 +5,12 @@ function NavTabs(props) {
 
     console.log(props);
 
+    if(!props.isLoggedIn){
+        return null;
+    }
+
     return (
-        <ul className="nav nav-tabs">
+        <ul className="nav nav-tabs justify-content-center">
             <li className="nav-item">
                 <Link to="/home" className={window.location.pathname === "/home" ? "nav-link active" : "nav-link"}>
                     Home
