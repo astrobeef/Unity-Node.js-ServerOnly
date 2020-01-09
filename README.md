@@ -6,7 +6,7 @@
 - Once my game is downloaded, the user may launch the game and **play online with other players**.
 
 ### Future Functionality
-- [x] Allow users to chat across web and game servers.
+- [ ] Allow users to chat across web and game servers.
 - [ ] Make downloading the game more streamlined.
 
 ---
@@ -41,8 +41,8 @@
 
 ## Manager Scripts
 
-> ### **Server.js** - Manages game server and Socket.io
+> ### **[Server.js](https://github.com/astrobeef/Unity-Node.js-ServerOnly/blob/server-express/Classes/Server.js)** - Manages game server and Socket.io
 
-> ### **server.js** - Manages main server and connections to MongoDB.  Sets up routes for the website.
+> ### **[Server.js](https://github.com/astrobeef/Unity-Node.js-ServerOnly/blob/server-express/server.js)** - Manages main server and connections to MongoDB.  Sets up routes for the website.
 
-> ### **App.js** - Manages React client and routing.  Also contains integral methods for handling, checking, and authentication.
+> ### **[App.js](https://github.com/astrobeef/Unity-Node.js-ServerOnly/blob/server-express/client/src/App.js)** - Manages React client and routing.  Also contains integral methods for handling, checking, and authentication.
