@@ -22,6 +22,7 @@ module.exports = class Connection {
 
         socket.on("disconnect", function(){
             server.onDisconnected(connection);
+            connection.DB_deleteRef(connection, connection.player.id);
         });
 
         socket.on("joinGame", function(){
@@ -52,8 +53,8 @@ module.exports = class Connection {
         });
 
         //If we do NOT have a DB reference, create one.
-        if(!this.DB_checkRef(connection, connection.player.id)){
-            this.DB_createRef(connection, connection.player.id);
+        if(!connection.DB_checkRef(connection, connection.player.id)){
+            connection.DB_createRef(connection, connection.player.id);
         }
     }
 
@@ -102,6 +103,24 @@ module.exports = class Connection {
         }).then((data) => {
             console.log(data);
             console.log("created reference to the player");
+        })
+    }
+
+    /**
+     * 
+     * @param {Connection} connection - The connection (player) disconnecting from the game server.
+     * @param {String} playerID - The ID of the player, from the connection (connection.player.id)
+     */
+    DB_deleteRef(connection = Connection, playerID = String){
+        const db = require("../models");
+
+        console.log(`Setting reference in our DB for the player ${playerID}`);
+
+        db.Player.deleteOne({
+            connection_id: playerID
+        }).then((data) => {
+            console.log(data);
+            console.log(`"Removed reference to the player, ${playerID}"`);
         })
     }
 }

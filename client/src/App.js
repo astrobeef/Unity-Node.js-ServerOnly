@@ -87,6 +87,7 @@ function App() {
 	function DB_getPlayers() {
 		API.getPlayers()	//Call the getPlayers() method off of our API object, which was imported from Utils.
 			.then(db_players => {		//Then, with the retrieved data, ...
+				console.log(db_players);
 				setPlayers(db_players);		//Set our players state to the retrieved data.
 			}
 			)

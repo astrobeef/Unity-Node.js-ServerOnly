@@ -1,7 +1,7 @@
 export default{
-    getPlayers: async function(){
+    getPlayers: function(){
 
-        return await fetch("api/players")
+        return fetch("api/players")
         .then(function(response){
             if(response.status !== 200){
                 console.error(`problem found with status code : ${response.status}`);

@@ -8,6 +8,7 @@ function Data(props) {
 
   useEffect(() => {
     props.DB_getPlayers();
+    console.log("Using data effect"); 
   }, []);
 
   return (

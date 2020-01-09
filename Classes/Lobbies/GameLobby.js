@@ -17,29 +17,47 @@ module.exports = class GameLobby extends LobbyBase {
         lobby.updateDeadPlayers();
     }
 
+    /**
+     * Checks if the lobby is full.
+     * @param {Connection} connection - The connection attempting to join the lobby.
+     * @returns true/false if the player can join the lobby.
+     */
     canEnterLobby(connection = Connection) {
-        const lobby = this;
-        const maxPlayerCount = lobby.settings.maxPlayers;
-        const currentPlayerCount = lobby.connections.length;
+        const lobby = this;     //Set a reference to this lobby.
+        const maxPlayerCount = lobby.settings.maxPlayers;       //Set a reference to our set number of max players.
+        const currentPlayerCount = lobby.connections.length;        //Get a reference to how many connections(players) are currently connected.
 
+        //If adding a new player would exceed our max count, then return false: we cannot add another player.
         if (currentPlayerCount + 1 > maxPlayerCount) {
             return false;
         }
-
-        return true;
+        //ELSE, we have room to add another player.
+        else{
+            return true;
+        }
     }
 
+    /**
+     * Adds the connecting player to the lobby and runs any functionality from the 'super' method.
+     * ** Handles any spawning of server spawned objects, although there is nothing yet**
+     * @param {Object} connection - The player connecting to the lobby.
+     */
     onEnterLobby(connection = Connection) {
         const lobby = this;
 
-        super.onEnterLobby(connection);
+        super.onEnterLobby(connection);     //Runs this method on the super.
 
-        lobby.addPlayer(connection);
+        lobby.addPlayer(connection);        //Add the connection (the player) to THIS lobby.
 
         //Handle spawning any server spawned objects here
         //Example : Loot, bullets, etc.
     }
 
+    /**
+     * Removes the connecting player from the lobby and runs any functionality from the 'super' method.
+     * ** Handles any spawning of server spawned objects, although there is nothing yet **
+     * @param {Object} connection - The player disconnecting from the lobby.
+     */
     onLeaveLobby(connection = Connection) {
         const lobby = this;
 

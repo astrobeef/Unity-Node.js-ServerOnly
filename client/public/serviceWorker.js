@@ -11,12 +11,10 @@ const FILES_TO_CACHE = [
     "/assets/images/icons/icon-152x152.png",
     "/assets/images/icons/icon-192x192.png",
     "/assets/images/icons/icon-384x384.png",
-    "/assets/images/icons/icon-512x512.png",
-    "./assets/game-builds/buildv1.1.rar",
-    "./assets/game-builds/buildv1.1"
+    "/assets/images/icons/icon-512x512.png"
 ];
 
-const GAME_ZIP = "./assets/game-builds/buildv1.1.rar";
+// const GAME_ZIP = "./assets/game-builds/buildv1.1.rar";
 
 const CACHE_NAME = "static-cache-v2";
 const DATA_CACHE_NAME = "data-cache-v1";
