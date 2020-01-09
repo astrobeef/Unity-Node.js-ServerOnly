@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 
 function Play(props) {
 
+  const buildString = "/assets/game-builds/" + props.build + ".zip";
+
   return (
     <div className="App">
       <header className="App-header">
@@ -26,7 +28,7 @@ function Play(props) {
 
               <h4 className="mt-5 mb-2">Download my Game!</h4>
               <button onClick={props.handleDownload} type="button" className="btn btn-warning my-2">
-                <Link to="/assets/game-builds/Buildv1.3-L.zip" target="_blank" download>Download</Link>
+                <Link to={buildString} target="_blank" download>Download</Link>
               </button>
             </div>
 

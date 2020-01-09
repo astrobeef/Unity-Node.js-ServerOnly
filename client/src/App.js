@@ -14,6 +14,8 @@ import API from "./utils/API";
 import NavTabs from './components/NavTabs';
 // import { ConnectionBase } from 'mongoose';
 
+const CURRENT_BUILD = "Buildv1.3-Heroku";
+
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState([]);           //A boolean value whether the user is logged in or not.
@@ -41,7 +43,7 @@ function App() {
       <NavTabs isLoggedIn={isLoggedIn ? true : false} />
       <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} handleInputChange={handleLoginInputChange} />} />
       <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut} />} />
-      <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded}/>} />
+      <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded} build = {CURRENT_BUILD}/>} />
       <Route exact path="/data" render={(props) => <Data {...props} players={players} displayPlayers={displayPlayers} DB_getPlayers={DB_getPlayers} />} />
       <Route exact path="/about" render={(props) => <About {...props} />} />
 
