@@ -1,3 +1,7 @@
+/** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Server.js - This script is responsible for setting up our Game Server and initializing our Socket.io functionality.
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 const Connection = require("./Connection");
 const Player = require("./Player");
 

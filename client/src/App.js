@@ -1,3 +1,7 @@
+/** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * App.js - This script establishes our React client, setting up the routes for our web page.  It also houses many methods which are intergral to our application : handler methods, check methods, and authentication methods (using AWS Amplify).
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 /*-------------------*/
 /*----NPM Imports----*/
 /*-------------------*/

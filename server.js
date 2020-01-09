@@ -2,6 +2,11 @@
 // ws://unity-node-game-server.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
 // https://unity-node-game-server.herokuapp.com/
 
+/** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * server.js - This script is responsible for starting the web server and game server.  It establishes connections to the database and sets up the routing for our web server.
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
 /*----------------*/
 /*Static Variables*/
 /*----------------*/
@@ -109,10 +114,6 @@ io.on("connection", function (socket/* The socket we've connected to */) {
     connection.db = require("./models");                                    //Set a reference, for our connection, to our database.
     connection.createEvents();                                              //Create the events for our connection.
     connection.socket.emit("register", { 'id': connection.player.id });         //Register our connection with the ID of our player, found from our connection.
-    // socket.emit("news", { hello: "world" });
-    // socket.on("my other event", function (data) {
-    //     console.log(data);
-    // });
 });
 
 /*-------------------------*/
@@ -153,11 +154,13 @@ const databaseUrl = process.env.MONGODB_URI || DB_NAME;
 const collections = [DB_NAME];
 
 //Set reference to our database.
-// const db = mongojs(databaseUrl, collections);
 const db = require("./models");
 
 DB_WipeOnStart();
 
+/**
+ * Wipes our database when called.  Should be called at start.
+ */
 function DB_WipeOnStart() {
     console.warn(`!!! Wiping our MongoDB !!!`);
 
