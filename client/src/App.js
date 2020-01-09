@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Auth } from "aws-amplify";
 
+import child_process from "child_process";
+
 import './App.css';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
@@ -15,6 +17,7 @@ import NavTabs from './components/NavTabs';
 // import { ConnectionBase } from 'mongoose';
 
 const CACHE_NAME = "static-cache-v2";
+const BUILD_NAME = "Buildv1.3-L";
 
 function App() {
 
@@ -60,7 +63,6 @@ function App() {
       })
     })
     console.log("-".repeat(60));
-
 
   }
 

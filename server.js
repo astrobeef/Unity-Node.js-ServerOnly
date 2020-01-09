@@ -6,8 +6,9 @@
 /*Static Variables*/
 /*----------------*/
 
-PORT = process.env.PORT || 52300;       //If we are provided a port by a third party, then use that.  If not, use port 52300.
-DB_NAME = "unity-node-database";        //Specify the name of our mongoose database
+const PORT = process.env.PORT || 52300;       //If we are provided a port by a third party, then use that.  If not, use port 52300.
+const DB_NAME = "unity-node-database";        //Specify the name of our mongoose database
+const BUILD_NAME = "Buildv1.3-L";
 
 //File imports
 const Server = require("./Classes/Server");
@@ -21,6 +22,9 @@ const app = express();                                          //Establish expr
 
 const path = require("path");                                   //Import for file paths.
 
+const fs = require("fs");
+const unzipper = require("unzipper");
+
 //Mongoose requires
 const mongojs = require("mongojs");
 const mongoose = require("mongoose");
@@ -29,6 +33,22 @@ const logger = require("morgan");
 //---Connecting web server and game server to one port
 const server = require("http").Server(app);                     //Wrap our express server in an http server.  This will allow us to connect our game server and web server with sockets.
 const io = require("socket.io")(server);                        //Wrap our server in a socket element so we may use sockets to connect our servers.
+
+/*--------------------*/
+/*--- Extract Zip ----*/
+/*--------------------*/
+
+// if(fs.existsSync("./client/public/assets/game-builds/unzipped/")){
+//     console.log("File is already unzipped");
+// }
+// else{
+//     fs.createReadStream(`./client/public/assets/game-builds/${BUILD_NAME}.zip`)
+//     .pipe(unzipper.Extract({path : "./client/public/assets/game-builds/unzipped"})).promise().then(
+//         () => {
+//             console.log("finished extracting file");
+//         }
+//     )
+// }
 
 /*--------------------*/
 /*Middleware functions*/
