@@ -24,8 +24,7 @@
     "nodemon": "^2.0.2",
     "react-router-dom": "^5.1.2",
     "shortid": "^2.2.15",
-    "socket.io": "^2.3.0",
-    "unzipper": "^0.10.5"
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "concurrently": "^5.0.2"

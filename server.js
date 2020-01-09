@@ -28,7 +28,6 @@ const app = express();                                          //Establish expr
 const path = require("path");                                   //Import for file paths.
 
 const fs = require("fs");
-const unzipper = require("unzipper");
 
 //Mongoose requires
 const mongojs = require("mongojs");
