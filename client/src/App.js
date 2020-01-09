@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Auth } from "aws-amplify";
 
-import child_process from "child_process";
-
 import './App.css';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
@@ -16,9 +14,6 @@ import API from "./utils/API";
 import NavTabs from './components/NavTabs';
 // import { ConnectionBase } from 'mongoose';
 
-const CACHE_NAME = "static-cache-v2";
-const BUILD_NAME = "Buildv1.3-L";
-
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState([]);           //A boolean value whether the user is logged in or not.
@@ -28,15 +23,16 @@ function App() {
 
   const [login, setLogin] = useState({ name: "login" });
 
+  const [hasDownloaded, setHasDownloaded] = useState(false);
+
   useEffect(() => {
 
     console.log("-".repeat(60));
     console.log("PROMPT : We are not logged in.  We should check if the user is logged in.");
 
     AUTHO_checkUser();
+    checkIfDownloaded();
   }, []);
-
-  unzipGame();
 
   return (
 
@@ -45,7 +41,7 @@ function App() {
       <NavTabs isLoggedIn={isLoggedIn ? true : false} />
       <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} handleInputChange={handleLoginInputChange} />} />
       <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut} />} />
-      <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload}/>} />
+      <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded}/>} />
       <Route exact path="/data" render={(props) => <Data {...props} players={players} displayPlayers={displayPlayers} DB_getPlayers={DB_getPlayers} />} />
       <Route exact path="/about" render={(props) => <About {...props} />} />
 
@@ -53,18 +49,6 @@ function App() {
     </Router>
 
   );
-
-  function unzipGame(){
-    console.log("-".repeat(60));
-    console.log("PROMPT : attempting to unzip game file...");
-    caches.open(CACHE_NAME).then(cache => {
-      cache.matchAll("/assets/game-builds/buildv1.1.rar", {}).then(function(response){
-        console.log(response);
-      })
-    })
-    console.log("-".repeat(60));
-
-  }
 
   function DB_getPlayers() {
     API.getPlayers()
@@ -110,6 +94,45 @@ function App() {
 
   function handleDownload(event){
     console.log("handling download");
+
+    localStorage.setItem("hasDownloaded", true);
+
+    if(hasDownloaded !== true){
+      setHasDownloaded(true);
+    }
+  }
+
+  function handleDownloadLost(event){
+    console.log("Handling loss of download");
+
+    localStorage.removeItem("hasDownloaded");
+
+    if(hasDownloaded){
+      setHasDownloaded(false);
+    }
+  }
+
+  function checkIfDownloaded(){
+    console.log("-".repeat(60));
+    console.log("PROMPT : Checking if the user has downloaded the game ...");
+
+    const localDownload = localStorage.getItem("hasDownloaded");
+
+    //The user has downloaded the game before.
+    if(localDownload){
+      setHasDownloaded(true);
+
+      console.log("RESULT : The user has downloaded the game");
+      console.log("-".repeat(60));
+    }
+    else{
+      if(hasDownloaded){
+        setHasDownloaded(false);
+
+        console.log("RESULT : The user has NOT downloaded the game");
+        console.log("-".repeat(60));
+      }
+    }
   }
 
   //AWS Autho

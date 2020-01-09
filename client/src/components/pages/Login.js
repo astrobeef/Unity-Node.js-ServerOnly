@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from "react";
-// import { Link } from "react-router-dom";
-import { Auth } from "aws-amplify";
-import { Link } from "react-router-dom";
+import React, { useEffect} from "react";
 
 function Login(props) {
 

@@ -72,7 +72,7 @@ self.addEventListener("fetch", function(event){
             caches.open(DATA_CACHE_NAME).then(cache => {
                 //Passing in the cache we have opened, return the request of our fetch call being made, then...
                 return fetch(event.request)
-                .then(resposne => {
+                .then(response => {
                     //Based on the response of our fetch call, if the response is OK, then...
                     if(response.status === 200){
                         //Clone the response of our fetch into our cache, saving the url used to call this fetch.  We do this so we may replicate the fetch in the event that we are offline.

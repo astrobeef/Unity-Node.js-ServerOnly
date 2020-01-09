@@ -14,7 +14,7 @@ function Data(props) {
         <h1>Data</h1>
         <h3>Connected Players</h3>
 
-        {props.players[0] ? props.displayPlayers() : <p>No players connected</p>}
+        {props.players ? props.displayPlayers() : <p>No players connected</p>}
 
         <button type="button"   className="btn btn-primary">
           <Link to="/home" className={window.location.pathname === "/home" ? "nav-link active" : "nav-link"}>
