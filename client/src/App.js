@@ -54,7 +54,7 @@ function App() {
 
   const [hasDownloaded, setHasDownloaded] = useState(false);		//A boolean value whether the user has downloaded the game or not.
 
-  const [connection, setConnection] = useState({ active: false});
+  const [connection, setConnection] = useState({ active: false });
 
   //---Use Effect
   //-------Runs when state changes.
@@ -74,7 +74,7 @@ function App() {
 
   }, []);
 
-  function setAccessToken(event){
+  function setAccessToken(event) {
 
     event.persist();
 
@@ -82,7 +82,7 @@ function App() {
 
       const accessToken = sessionData.getAccessToken().getJwtToken();
 
-      setConnection({accessToken});
+      setConnection({ accessToken });
 
       handleCopyAccessToken(event.target);
     });
@@ -95,8 +95,8 @@ function App() {
 
         <NavTabs isLoggedIn={isLoggedIn ? true : false} />
         <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} handleInputChange={handleLoginInputChange} isLoggedIn={isLoggedIn} />} />
-        <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut}/>} />
-        <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded} build={CURRENT_BUILD}  setAccessToken = {setAccessToken} accessToken = {connection.accessToken}/>} />
+        <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut} />} />
+        <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded} build={CURRENT_BUILD} setAccessToken={setAccessToken} accessToken={connection.accessToken} />} />
         <Route exact path="/data" render={(props) => <Data {...props} players={players} DB_getPlayers={DB_getPlayers} />} />
         <Route exact path="/about" render={(props) => <About {...props} />} />
 
@@ -170,15 +170,15 @@ function App() {
       setHasDownloaded(false);		//Alter the state of 'hasDownloaded to false.
     }
   }
-  
+
   function handleCopyAccessToken(target) {
-    if(target){
-      if(target.id !== "data-token"){
+    if (target) {
+      if (target.id !== "data-token") {
         console.log("We did not click on the button");
 
         handleCopyAccessToken(target.parentNode);
       }
-      else{
+      else {
         const atr = target.getAttribute("data-token");
 
         const dummyTextArea = document.createElement("textarea");
@@ -193,7 +193,7 @@ function App() {
         console.log("Copied to clipboard!");
 
         setTimeout(() => {
-          setConnection({accessToken : null});
+          setConnection({ accessToken: null });
         }, 2000)
 
       }
@@ -238,7 +238,10 @@ function App() {
       setIsRegistered(true);		//Set is registered to true.
     }
     else {
-      setIsRegistered(false);		//Set is registered to false.
+      console.warn("!".repeat(60));
+      console.warn("Setting isRegistered to true for testing");
+      console.warn("!".repeat(60));
+      setIsRegistered(true);
     }
   }
 
@@ -252,6 +255,10 @@ function App() {
 	 */
   function AUTHO_signIn(event) {
     event.preventDefault();		//Prevent the default action of the event.
+
+    console.warn("!".repeat(60));
+    console.warn("Setting isRegistered to true for testing");
+    console.warn("!".repeat(60));
 
     //If the user is registered, then...
     if (isRegistered /* Checked on 'useEffect' */) {
@@ -276,7 +283,21 @@ function App() {
     }
     //ELSE the user has never registered, so...
     else {
-      Auth.federatedSignIn();		//Run federated Sign in to sign up the user.
+
+      const username = "AstroBeef";
+      const password = "00000000";
+      const email = "brian.g.graf@gmail.com";
+
+
+      //SIGN UP USER
+      Auth.signUp({
+        username,
+        password,
+        attributes: {
+          email
+        },
+        validationData: []
+      }).then(data => console.log(data)).catch(err => console.log(err));
     }
   }
 
