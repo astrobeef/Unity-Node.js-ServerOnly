@@ -24,6 +24,7 @@ const Server = require("./Classes/Server");
 
 const express = require("express")                              //Import the 'express' npm package.  Used to establish server connections for web client.
 const app = express();                                          //Establish express server.
+const axios = require("axios");
 
 const path = require("path");                                   //Import for file paths.
 
@@ -35,8 +36,18 @@ const mongoose = require("mongoose");
 const logger = require("morgan");
 
 //---Connecting web server and game server to one port
-const server = require("http").Server(app);                     //Wrap our express server in an http server.  This will allow us to connect our game server and web server with sockets.
+const server = require("http").createServer(app);                     //Wrap our express server in an http server.  This will allow us to connect our game server and web server with sockets.
 const io = require("socket.io")(server);                        //Wrap our server in a socket element so we may use sockets to connect our servers.
+
+const getApiAndEmit = async socket => {
+    try {
+        const res = await axios.get("localhost:3000/api/players");
+
+        socket.emit("FromAPI", "what up");
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 /*--------------------*/
 /*--- Extract Zip ----*/
@@ -105,15 +116,38 @@ setInterval(() => {         //Each 100ms, repeated infintely, do the following
 /*-------- Socket --------*/
 /*------------------------*/
 
-//Upon a socket.io connection, do the following, passing in the 'socket' connection
-io.on("connection", function (socket/* The socket we've connected to */) {
+let webInterval;
 
-    const connection = cServer.onConnected(socket);             //Run the "onConnected" method on our server, passing in our 'socket' connection.  Establish a reference to the connection made with the socket.
+//Upon a socket.io connection, do the following, passing in the 'socket' connection
+io.on("connection", function (iSocket/* The socket connecting */) {
+
+    console.log("~".repeat(60));
+    console.log("Log from web server :: Running connection to socket");;
+    console.log("~".repeat(60));
+
+    const connection = cServer.onConnected(iSocket);             //Run the "onConnected" method on our server, passing in our 'socket' connection.  Establish a reference to the connection made with the socket.
 
     connection.db = require("./models");                                    //Set a reference, for our connection, to our database.
     connection.createEvents();                                              //Create the events for our connection.
     connection.socket.emit("register", { 'id': connection.player.id });         //Register our connection with the ID of our player, found from our connection.
+
+    if (!webInterval) {
+        webInterval = setInterval(() => {
+
+            iSocket.emit("test", "hello");
+            
+            console.log("Emit FromAPI");
+        }, 1000, 0);
+    }
+
+    iSocket.on("disconnect", () => {
+        console.log("~".repeat(60));
+        console.log("Log from web server :: Client disconnected");
+        console.log("~".repeat(60));
+    });
 });
+
+
 
 /*-------------------------*/
 /*-------- Methods --------*/

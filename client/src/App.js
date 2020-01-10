@@ -6,9 +6,10 @@
 /*----NPM Imports----*/
 /*-------------------*/
 
-import React, { useState, useEffect } from 'react';         //React Import
+import React, { useState, useEffect, Component } from 'react';         //React Import
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { Auth } from "aws-amplify";							//AWS Amplify Authentication import
+import socketIOClient from "socket.io-client";
 
 /*-------------------*/
 /*---Local Imports---*/
@@ -53,11 +54,25 @@ function App() {
 
   const [hasDownloaded, setHasDownloaded] = useState(false);		//A boolean value whether the user has downloaded the game or not.
 
+  const [connection, setConnection] = useState({active : false, response : false, endpoint : "ws://127.0.0.1:52300/socket.io/?EIO=4&transport=websocket"});
+
   //---Use Effect
   //-------Runs when state changes.
   useEffect(() => {
+    console.log("Using effect");
     AUTHO_checkUser();
     checkIfDownloaded();
+
+    if(!connection.active){
+      setConnection({active : true});
+  
+      const { endpoint } = connection;
+  
+      const socket = socketIOClient(endpoint);
+  
+      console.log("We are trying to connect to server with Socket.io");  
+    }
+
   }, []);
 
   //Return the render content for the web page.

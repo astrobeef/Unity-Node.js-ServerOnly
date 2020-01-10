@@ -1,5 +1,5 @@
 module.exports = class Connection {
-    constructor(){
+    constructor() {
         this.socket;
         this.player;
         this.server;
@@ -13,31 +13,30 @@ module.exports = class Connection {
         const socket = connection.socket;
         const server = connection.server;
         const player = connection.player;
-        if(this.db){
+        if (this.db) {
             console.log("We have made a connection to our MongoDB");
         }
-        else{
+        else {
             console.warn("We have not connected to our mongoDB");
         }
 
-        socket.on("disconnect", function(){
+        socket.on("disconnect", function () {
             server.onDisconnected(connection);
             connection.DB_deleteRef(connection, connection.player.id);
         });
 
-        socket.on("joinGame", function(){
+        socket.on("joinGame", function () {
             server.onAttemptToJoinGame(connection);
         });
-
-        socket.on("fireBullet", function(unityData){
+        socket.on("fireBullet", function (unityData) {
             connection.lobby.onFireBullet(connection, unityData);
         });
 
-        socket.on("collisionDestroy", function(unityData){
+        socket.on("collisionDestroy", function (unityData) {
             connection.lobby.onCollisionDestroy(connection, unityData);
         });
-
-        socket.on("updatePosition", function(unityData){
+        socket.on("updatePosition", function (unityData) {
+            console.log("Hello");            
             player.position.x = unityData.position.x;
             player.position.y = unityData.position.y;
             player.position.z = unityData.position.z;
@@ -45,7 +44,7 @@ module.exports = class Connection {
             socket.broadcast.to(connection.lobby.id).emit("updatePosition", player);
         });
 
-        socket.on("updateRotation", function(unityData){
+        socket.on("updateRotation", function (unityData) {
             player.tankRotation = unityData.tankRotation;
             player.barrelRotation = unityData.barrelRotation;
 
@@ -53,7 +52,7 @@ module.exports = class Connection {
         });
 
         //If we do NOT have a DB reference, create one.
-        if(!connection.DB_checkRef(connection, connection.player.id)){
+        if (!connection.DB_checkRef(connection, connection.player.id)) {
             connection.DB_createRef(connection, connection.player.id);
         }
     }
@@ -64,20 +63,20 @@ module.exports = class Connection {
      * @param {String} playerID - The ID of our connected player (connection.player.id)
      * @returns - Returns true if this connection exists within the Database, false if not
      */
-    DB_checkRef(connection = Connection, playerID = String){
+    DB_checkRef(connection = Connection, playerID = String) {
         const db = connection.db;
 
         console.log(`our connection_id is ${playerID}`);
 
-        db.Player.find({connection_id : playerID}, (err, data) => {
-            if(err) throw err;
+        db.Player.find({ connection_id: playerID }, (err, data) => {
+            if (err) throw err;
 
-            if(data.length > 0){
+            if (data.length > 0) {
                 console.log("Found reference to this player in our DB");
 
                 return true;
             }
-            else{
+            else {
                 console.log("No reference to this player in our DB...");
 
                 return false;
@@ -91,7 +90,7 @@ module.exports = class Connection {
      * @param {Connection} connection - Our connection
      * @param {String} playerID - The ID of our connected player (connection.player.id)
      */
-    DB_createRef(connection = Connection, playerID = String){
+    DB_createRef(connection = Connection, playerID = String) {
         const db = require("../models");
 
         console.log(`Setting reference in our DB for the player ${playerID}`);
@@ -111,7 +110,7 @@ module.exports = class Connection {
      * @param {Connection} connection - The connection (player) disconnecting from the game server.
      * @param {String} playerID - The ID of the player, from the connection (connection.player.id)
      */
-    DB_deleteRef(connection = Connection, playerID = String){
+    DB_deleteRef(connection = Connection, playerID = String) {
         const db = require("../models");
 
         console.log(`Setting reference in our DB for the player ${playerID}`);
