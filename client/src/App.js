@@ -63,14 +63,14 @@ function App() {
     AUTHO_checkUser();
     checkIfDownloaded();
 
-    if (!connection.active) {
-      setConnection({ active: true });
+    // if (!connection.active) {
+    //   setConnection({ ...connection, active: true });
 
-      setInterval(() => {
-        DB_getPlayers();
-        console.log(connection);
-      }, 10000);
-    }
+    //   setInterval(() => {
+    //     DB_getPlayers();
+    //     console.log(connection);
+    //   }, 10000);
+    // }
 
   }, []);
 
@@ -78,14 +78,14 @@ function App() {
 
     event.persist();
 
-    Auth.currentSession().then((sessionData) => {
+    if (!connection.accessToken) {
 
-      const accessToken = sessionData.getAccessToken().getJwtToken();
-
-      setConnection({ accessToken });
-
-      handleCopyAccessToken(event.target);
-    });
+      AUTHO_SetAccessToken(loginInfo.username, event);
+    }
+    else {
+      console.log("Now that's efficency!");
+      handleCopyAccessToken(event.target, connection.accessToken);
+    }
   }
 
   //Return the render content for the web page.
@@ -94,9 +94,9 @@ function App() {
       <Router>
 
         <NavTabs isLoggedIn={isLoggedIn ? true : false} />
-        <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} handleInputChange={handleLoginInputChange} isLoggedIn={isLoggedIn} />} />
+        <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} signUp={AUTHO_signUp} handleInputChange={handleLoginInputChange} isLoggedIn={isLoggedIn} handleHasRegistered={handleHasRegistered} />} />
         <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut} />} />
-        <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded} build={CURRENT_BUILD} setAccessToken={setAccessToken} accessToken={connection.accessToken} />} />
+        <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded} build={CURRENT_BUILD} setAccessToken={setAccessToken} displaySuccess={connection.displaySuccess} />} />
         <Route exact path="/data" render={(props) => <Data {...props} players={players} DB_getPlayers={DB_getPlayers} />} />
         <Route exact path="/about" render={(props) => <About {...props} />} />
 
@@ -115,15 +115,74 @@ function App() {
 	 */
   function DB_getPlayers() {
     API.getPlayers()	//Call the getPlayers() method off of our API object, which was imported from Utils.
-      .then(db_players => {		//Then, with the retrieved data, ...
+      .then((db_players) => {		//Then, with the retrieved data, ...
         console.log(db_players);
         setPlayers(db_players);		//Set our players state to the retrieved data.
       }
       )
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   };
+
+  /**
+   * Registers the user into our Mongo Database.
+   * @param {string} username - The user to be added to the database.
+   */
+  function DB_registerUser(username) {
+
+    console.log(`"Registering user, ${username}, to Mongo DB..."`);
+
+    /*Check if the user is already registered*/ const DB_isRegistered = false; // For now, we assume no.
+
+    const payload = { username };
+
+    //CHECK IF USER IS REGISTERED
+
+    API.getUser(username)
+      .then((db_User) => {
+        console.log(db_User);
+        console.log("Found reference to user in MongoDB");
+
+        DB_isRegistered = true;
+      }).catch((err) => {
+        console.log(err);
+      });
+
+    //REGISTER USER
+
+    if (!DB_isRegistered) {
+
+      API.createUser(payload)
+        .then((db_User) => {
+          console.log(db_User);
+          console.log("successfully created a user in our MongoDB!");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+    } else {
+      DB_updateUser(username);
+    }
+
+  };
+
+  /**
+   * Updates the access token of the user.
+   */
+  function DB_updateUser(username) {
+
+    API.updateUser(username)
+      .then((db_User) => {
+        console.log(db_User);
+        console.log("successfully created a user in our MongoDB!");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+  }
 
   /*-----------------------*/
   /*-- Handler Functions --*/
@@ -139,6 +198,9 @@ function App() {
     const { target } = event;		//Pull the target off of our event.
     const value = target.value;		//Set a reference for our target's value (the user's input).
     const { name } = target;		//Pull the name off of our target (the element to be changed by the input).
+
+    console.log(`value : ${value}`);
+    console.log(`name : ${name}`);
 
     setLoginInfo({ ...loginInfo, [name]: value });		//Set the key of 'name' to the value of 'value', so the user's input alters their login info.
   }
@@ -171,15 +233,15 @@ function App() {
     }
   }
 
-  function handleCopyAccessToken(target) {
+  function handleCopyAccessToken(target, token) {
     if (target) {
-      if (target.id !== "data-token") {
+      if (target.id !== "data-token" && target.id !== "download-btn") {
         console.log("We did not click on the button");
 
-        handleCopyAccessToken(target.parentNode);
+        handleCopyAccessToken(target.parentNode, token);
       }
       else {
-        const atr = target.getAttribute("data-token");
+        const atr = token;
 
         const dummyTextArea = document.createElement("textarea");
 
@@ -192,14 +254,24 @@ function App() {
 
         console.log("Copied to clipboard!");
 
-        setTimeout(() => {
-          setConnection({ accessToken: null });
-        }, 2000)
+        if (!connection.displaySuccess) {
+          setConnection({ ...connection, "accessToken": atr, displaySuccess: true });
+
+          setTimeout(() => {
+            setConnection({ ...connection, "accessToken": atr, displaySuccess: false });
+          }, 2000);
+        }
 
       }
     }
-
   };
+
+  /**
+   * Runs if the user has already registerd but we did not recognize it
+   */
+  function handleHasRegistered() {
+    setIsRegistered(true);
+  }
 
   /*-----------------------*/
   /*--- Check Functions ---*/
@@ -238,10 +310,7 @@ function App() {
       setIsRegistered(true);		//Set is registered to true.
     }
     else {
-      console.warn("!".repeat(60));
-      console.warn("Setting isRegistered to true for testing");
-      console.warn("!".repeat(60));
-      setIsRegistered(true);
+      setIsRegistered(false);
     }
   }
 
@@ -256,54 +325,75 @@ function App() {
   function AUTHO_signIn(event) {
     event.preventDefault();		//Prevent the default action of the event.
 
-    console.warn("!".repeat(60));
-    console.warn("Setting isRegistered to true for testing");
-    console.warn("!".repeat(60));
+    //If we have login info, then...
+    if (loginInfo /* Updated upon user input */) {
+      //If we have a username and password, then...
+      if (loginInfo.username && loginInfo.password) {
+        const username = loginInfo.username;
+        const password = loginInfo.password;
 
-    //If the user is registered, then...
-    if (isRegistered /* Checked on 'useEffect' */) {
-      //If we have login info, then...
-      if (loginInfo /* Updated upon user input */) {
-        //If we have a username and password, then...
-        if (loginInfo.username && loginInfo.password) {
-          const username = loginInfo.username;
-          const password = loginInfo.password;
-
-          //Use AWS Amplify to attempt to sign in our user.
-          Auth.signIn(username, password)
-            .then(user => {		//If successful, then...
-              AUTHO_RegisterUser(username);		//Register the user into the local storage.
-              setIsLoggedIn(true);				//Set our state 'isLoggedIn' to true.
-            })
-            .catch(err => {		//If unsuccessful, then...
-              console.log(err);
-            });
-        }
+        //Use AWS Amplify to attempt to sign in our user.
+        Auth.signIn(username, password)
+          .then(user => {		//If successful, then...
+            AUTHO_UponSuccessfulSignIn(username);
+          })
+          .catch(err => {		//If unsuccessful, then...
+            console.log(err);
+          });
       }
-    }
-    //ELSE the user has never registered, so...
-    else {
-
-      const username = "AstroBeef";
-      const password = "00000000";
-      const email = "brian.g.graf@gmail.com";
-
-
-      //SIGN UP USER
-      Auth.signUp({
-        username,
-        password,
-        attributes: {
-          email
-        },
-        validationData: []
-      }).then(data => console.log(data)).catch(err => console.log(err));
+      else {
+        console.warn("Missing username or password for login");
+      }
     }
   }
 
-	/**
-	 * Use AWS Amplify to sign out the user.  Change our state as well.
-	 */
+  /**
+   * Uses AWS Amplify to sign up a new user.
+   * @param {Object} event - The event fired with the action.
+   */
+  function AUTHO_signUp(event) {
+
+    if (loginInfo /* Updated upon user input */) {
+      //If we have a username and password, then...
+      if (loginInfo.username && loginInfo.password && loginInfo.email) {
+        const username = loginInfo.username;
+        const password = loginInfo.password;
+        const email = loginInfo.email;
+
+        //Use AWS Amplify to attempt to sign up the user.
+        Auth.signUp({
+          username,
+          password,
+          attributes: {
+            email
+          }
+        }).then((user) => {
+          AUTHO_UponSuccessfulSignIn(username);
+        })
+          .catch((err) => {
+            console.log(err);
+            console.warn("Could not log in");
+          });
+      }
+      else {
+        console.warn("We do not have a filled username, password, and/or, email");
+      }
+    }
+  }
+
+  /**
+   * Runs several functions once the user has signed in
+   * @param {String} username - The name of the user being signed in.
+   */
+  function AUTHO_UponSuccessfulSignIn(username) {
+
+    AUTHO_RegisterUser(username);		//Register the user into the local storage and mongo DB.
+    setIsLoggedIn(true);				//Set our state 'isLoggedIn' to true.
+  }
+
+  /**
+   * Use AWS Amplify to sign out the user.  Change our state as well.
+   */
   function AUTHO_signOut() {
     //Use the 'signOut' method off of AWS Amplify Authentication.
     Auth.signOut()
@@ -314,15 +404,18 @@ function App() {
       .catch(err => console.log(err))
   }
 
-	/**
-	 * Uses AWS Amplify to check if there is a user logged in.  If yes, then register the user to the local storage.
-	 */
+  /**
+   * Uses AWS Amplify to check if there is a user logged in.  If yes, then register the user to the local storage.
+   */
   function AUTHO_checkUser() {
 
     //Use the method off of AWS Amplify Authentication
     Auth.currentAuthenticatedUser()
       .then(user => {
         //User IS logged in.
+
+        AUTHO_SetAccessToken(user.username, {});
+        setLoginInfo({ ...loginInfo, username: user.username });
 
         //If our state is not already set to true, then...
         if (isLoggedIn !== true) {
@@ -350,13 +443,36 @@ function App() {
       })
   }
 
-	/**
-	 * Sets a reference to the user in local storage so we can know the user has registered.
-	 * @param {String} username - The username of the current user.
-	 */
+  function AUTHO_SetAccessToken(username, event) {
+
+    Auth.currentSession().then((sessionData) => {
+
+      const accessToken = sessionData.getAccessToken().getJwtToken();
+
+      setConnection({ ...connection, "accessToken": accessToken });
+
+      DB_registerUser(username);
+
+      if (event.target) {
+        handleCopyAccessToken(event.target, accessToken);
+      }
+
+    }).catch((err) => {
+      console.error(err);
+
+      console.err("Could not get current session data");
+    })
+  }
+
+  /**
+   * Sets a reference to the user in local storage and in our Database so we can know the user has registered.
+   * @param {String} username - The username of the current user.
+   */
   function AUTHO_RegisterUser(username) {
     localStorage.setItem("registered", username);		//Set an item 'registered' in our local storage so we may check it later.
     setIsRegistered(true);		//Set our state 'isRegistered' to true.
+
+
   }
 }
 

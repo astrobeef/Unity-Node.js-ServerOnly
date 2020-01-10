@@ -12,10 +12,10 @@ function Play(props) {
         {props.hasDownloaded ?
           <div><h1>You've downloaded the game!</h1>
 
-            <h4 className="my-3">{props.accessToken ? <span className = "highlight">Copied to clipboard!</span> : <span>Get your access token here</span>
+            <h4 className="my-3">{props.displaySuccess ? <span className = "highlight">Copied to clipboard!</span> : <span>Get your access token here</span>
             }</h4>
 
-              <button id = "data-token" type="button" className="btn btn-primary" onClick={props.setAccessToken} data-token= {props.accessToken}>
+              <button id = "data-token" type="button" className="btn btn-primary" onClick={props.setAccessToken}>
                 <h2 className="m-2">Access Token</h2>
               </button>
 
@@ -35,7 +35,7 @@ function Play(props) {
               <a className="winRAR" href="https://www.rarlab.com/rar/rarosx-5.8.0.tar.gz"> Mac </a>
 
               <h4 className="mt-3 mb-2">Download my Game!</h4>
-              <button htmlFor="download-link" type="button" className="btn btn-primary mt-3">
+              <button id = "download-btn" htmlFor="download-link" type="button" className="btn btn-primary mt-3" onClick = {props.setAccessToken}>
                 <Link id="download-link" onClick={props.handleDownload} to={buildString} target="_blank" download ><h3>Download</h3></Link>
               </button>
             </div>

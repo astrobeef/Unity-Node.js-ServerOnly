@@ -105,3 +105,8 @@ a:hover{
 .light-yellow{
   color: #f6e5b4;
 }
+
+.bg-blue{
+  background-color: #041621;
+  background-image: none;
+}
