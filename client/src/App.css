@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  /* background-color: #282c34; */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -39,5 +39,51 @@
 
 
 .nav-link{
-  color: black;
+  color: #3e1e30;
+}
+
+.nav-link:hover{
+  color: #f6e5b4;
+}
+
+.BG{
+  background-image: url("./web-bg.png");
+}
+
+.btn{
+  color: #3e1e30;
+}
+
+.btn-primary{
+  background-color: #b95523;
+  border-style: none;
+}
+
+.btn:hover{
+  color: #f6e5b4;
+}
+
+.btn-primary:hover{
+  background-color: #3a8d68;
+  border-style: none;
+}
+
+Link{
+  color: #f6e5b4;
+}
+
+a{
+  color: #3e1e30;
+}
+
+a:hover{
+  color: #f6e5b4;
+}
+
+.winRAR{
+  color: #3ac588;
+}
+
+.header-light{
+  color: #f6e5b4;
 }

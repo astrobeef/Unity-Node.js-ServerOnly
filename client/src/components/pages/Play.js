@@ -23,12 +23,12 @@ function Play(props) {
               <h5>Once you've downloaded the ZIP file, open the file and run the 'launch.exe' file to play.</h5>
 
               <h4 className="mt-4">WinRAR 'trial' download</h4>
-              <a href="https://www.rarlab.com/rar/winrar-x64-580.exe"> Windows </a>
-              <a href="https://www.rarlab.com/rar/rarosx-5.8.0.tar.gz"> Mac </a>
+              <a className = "winRAR" href="https://www.rarlab.com/rar/winrar-x64-580.exe"> Windows </a>
+              <a className = "winRAR" href="https://www.rarlab.com/rar/rarosx-5.8.0.tar.gz"> Mac </a>
 
               <h4 className="mt-5 mb-2">Download my Game!</h4>
-              <button onClick={props.handleDownload} type="button" className="btn btn-warning my-2">
-                <Link to={buildString} target="_blank" download>Download</Link>
+              <button for="download-link" type="button" className="btn btn-primary m-3">
+                <Link id="download-link" onClick={props.handleDownload}  to={buildString} target="_blank" download ><h3>Download</h3></Link>
               </button>
             </div>
 
