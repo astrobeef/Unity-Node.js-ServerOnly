@@ -10,13 +10,11 @@
     "start:dev": "concurrently \"nodemon --ignore 'client/*'\" \"npm run client\"",
     "client": "cd client && npm run start",
     "install": "cd client && npm install",
-    "build": "cd client && npm run build",
     "heroku-postbuild": "npm run build"
   },
   "author": "Brian Graf (AstroBeef)",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.1",
     "express": "^4.17.1",
     "if-env": "^1.0.4",
     "mongojs": "^3.1.0",
