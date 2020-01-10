@@ -18,8 +18,7 @@ export default function displayPlayers(props) {
                 //Return a <DIV> for each 'player' within 'players'
                 return (
                     <div>
-                        <h3>{player.username}</h3>
-                        <p>{player.connection_id}</p>
+                        {player.username === "Default_Player" ? null : <h3>{player.username}</h3>}
                     </div>
                 )
             })}

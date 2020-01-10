@@ -91,7 +91,7 @@ module.exports = class Server {
 
         //BROADCAST DISCONNECTION
         //Broadcast to all connected sockets, with the player's lobby, that this connection has disconnected.
-        connection.socket.broadcast.to(connection.player.lobby).emit("disconnected", {
+        connection.socket.broadcast./*to(connection.player.lobby).*/emit("disconnected", {
             id: id
         });
 

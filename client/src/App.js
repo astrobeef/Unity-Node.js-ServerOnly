@@ -69,18 +69,15 @@ function App() {
     //   const { endpoint } = connection;
   
     //   const socket = socketIOClient(endpoint);
-
-    //   socket.on("test", (data) => {
-    //       console.log("recieving test");
-    //   })
-    //   socket.on("test complete", (data) => {
-    //       console.log("recieving test complete!!!");
-    //   })
-
-    //   socket.emit("test");
-  
-    //   console.log("We are trying to connect to server with Socket.io");  
     // }
+
+    if(!connection.active){
+      setConnection({active : true});
+
+      setInterval(() => {
+        DB_getPlayers();
+      }, 10000);
+    }
 
   }, []);
 

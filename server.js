@@ -109,21 +109,9 @@ setInterval(() => {         //Each 100ms, repeated infintely, do the following
 /*-------- Socket --------*/
 /*------------------------*/
 
-let webInterval;
 
 //Upon a socket.io connection, do the following, passing in the 'socket' connection
 io.on("connection", function (iSocket/* The socket connecting */) {
-
-    // if (!webInterval) {
-    //     webInterval = setInterval(() => {
-
-    //         iSocket.emit("test", "hello");
-    //     }, 1000, 0);
-    // }
-
-    // iSocket.on("test", (data) => {
-    //     iSocket.emit("test complete", "yay!");
-    // });
 
     const connection = cServer.onConnected(iSocket);             //Run the "onConnected" method on our server, passing in our 'socket' connection.  Establish a reference to the connection made with the socket.
 

@@ -20,20 +20,20 @@ module.exports = class Connection {
             console.warn("We have not connected to our mongoDB");
         }
 
-        socket.on("test", () => {
-            console.log(":-)  ".repeat(60));
-            console.log("test successful");
-            console.log(":-)  ".repeat(60));
-        })
-
         socket.on("disconnect", function () {
             server.onDisconnected(connection);
             connection.DB_deleteRef(connection, connection.player.id);
         });
 
-        socket.on("joinGame", function () {
+        socket.on("joinGame", function (unityData) {
+
+            const dataUsername = unityData.username;
+            console.log(dataUsername);
+
             server.onAttemptToJoinGame(connection);
+            connection.DB_alterRef(connection, connection.player.id, {"username" : dataUsername});
         });
+
         socket.on("fireBullet", function (unityData) {
             connection.lobby.onFireBullet(connection, unityData);
         });
@@ -42,7 +42,6 @@ module.exports = class Connection {
             connection.lobby.onCollisionDestroy(connection, unityData);
         });
         socket.on("updatePosition", function (unityData) {
-            console.log("Hello");            
             player.position.x = unityData.position.x;
             player.position.y = unityData.position.y;
             player.position.z = unityData.position.z;
@@ -70,23 +69,29 @@ module.exports = class Connection {
      * @returns - Returns true if this connection exists within the Database, false if not
      */
     DB_checkRef(connection = Connection, playerID = String) {
-        const db = connection.db;
-
-        console.log(`our connection_id is ${playerID}`);
+        const db = require("../models");
 
         db.Player.find({ connection_id: playerID }, (err, data) => {
             if (err) throw err;
 
             if (data.length > 0) {
-                console.log("Found reference to this player in our DB");
-
                 return true;
             }
             else {
-                console.log("No reference to this player in our DB...");
-
                 return false;
             }
+        })
+    }
+
+    DB_alterRef(connection = Connection, playerID = String, alterData = Object) {
+        const db = require("../models");
+
+        db.Player.update(
+            {connection_id : playerID},
+            {$set: alterData}
+        ).then((data) => {
+            console.log(data);
+            console.log("Successfully updated player data");
         })
     }
 
@@ -98,8 +103,6 @@ module.exports = class Connection {
      */
     DB_createRef(connection = Connection, playerID = String) {
         const db = require("../models");
-
-        console.log(`Setting reference in our DB for the player ${playerID}`);
 
         db.Player.create({
             connection_id: playerID,
@@ -117,8 +120,6 @@ module.exports = class Connection {
      */
     DB_deleteRef(connection = Connection, playerID = String) {
         const db = require("../models");
-
-        console.log(`Setting reference in our DB for the player ${playerID}`);
 
         db.Player.deleteOne({
             connection_id: playerID
