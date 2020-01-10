@@ -24,7 +24,6 @@ const Server = require("./Classes/Server");
 
 const express = require("express")                              //Import the 'express' npm package.  Used to establish server connections for web client.
 const app = express();                                          //Establish express server.
-const axios = require("axios");
 
 const path = require("path");                                   //Import for file paths.
 
@@ -38,16 +37,6 @@ const logger = require("morgan");
 //---Connecting web server and game server to one port
 const server = require("http").createServer(app);                     //Wrap our express server in an http server.  This will allow us to connect our game server and web server with sockets.
 const io = require("socket.io")(server);                        //Wrap our server in a socket element so we may use sockets to connect our servers.
-
-const getApiAndEmit = async socket => {
-    try {
-        const res = await axios.get("localhost:3000/api/players");
-
-        socket.emit("FromAPI", "what up");
-    } catch (error) {
-        console.error(error);
-    }
-}
 
 /*--------------------*/
 /*--- Extract Zip ----*/

@@ -47,7 +47,16 @@
 }
 
 .BG{
-  background-image: url("./web-bg.png");
+
+  box-sizing: border-box; /*Not necessary in this situation*/
+  display: block; /*Not necessary, but we do want it this way*/
+  width: 100vw;  /*Not necessary, but we do want it this way*/
+  height: 100vh; /*Necessary.  100vh = 100% of the viewport height*/
+  padding: 0; /* No padding */
+  margin: 0; /* No margins */
+  background: url('./web-bg.png') no-repeat center center;  
+  /* Shorthand: image, repeat, X align, Y align. */
+  background-size: cover; /* Cover all available space*/
 }
 
 .btn{
