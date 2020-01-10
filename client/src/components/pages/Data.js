@@ -12,7 +12,7 @@ function Data(props) {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <header className="App-header light-yellow">
 
         <h1>Data</h1>
         <h3>Connected Players</h3>

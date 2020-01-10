@@ -87,3 +87,12 @@ a:hover{
 .header-light{
   color: #f6e5b4;
 }
+
+.highlight{
+  text-decoration: underline;
+  color: #3ac588;
+}
+
+.light-yellow{
+  color: #f6e5b4;
+}

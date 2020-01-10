@@ -4,7 +4,7 @@ function About(props) {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <header className="App-header light-yellow">
 
         <h1>About Me</h1>
         <h3>I'm Brian Graf</h3>

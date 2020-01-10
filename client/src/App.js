@@ -54,7 +54,7 @@ function App() {
 
   const [hasDownloaded, setHasDownloaded] = useState(false);		//A boolean value whether the user has downloaded the game or not.
 
-  const [connection, setConnection] = useState({active : false, response : false, endpoint : "ws://127.0.0.1:52300/socket.io/?EIO=4&transport=websocket"});
+  const [connection, setConnection] = useState({ active: false});
 
   //---Use Effect
   //-------Runs when state changes.
@@ -63,23 +63,30 @@ function App() {
     AUTHO_checkUser();
     checkIfDownloaded();
 
-    // if(!connection.active){
-    //   setConnection({active : true});
-  
-    //   const { endpoint } = connection;
-  
-    //   const socket = socketIOClient(endpoint);
-    // }
-
-    if(!connection.active){
-      setConnection({active : true});
+    if (!connection.active) {
+      setConnection({ active: true });
 
       setInterval(() => {
         DB_getPlayers();
+        console.log(connection);
       }, 10000);
     }
 
   }, []);
+
+  function setAccessToken(event){
+
+    event.persist();
+
+    Auth.currentSession().then((sessionData) => {
+
+      const accessToken = sessionData.getAccessToken().getJwtToken();
+
+      setConnection({accessToken});
+
+      handleCopyAccessToken(event.target);
+    });
+  }
 
   //Return the render content for the web page.
   return (
@@ -87,9 +94,9 @@ function App() {
       <Router>
 
         <NavTabs isLoggedIn={isLoggedIn ? true : false} />
-        <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} handleInputChange={handleLoginInputChange} isLoggedIn={isLoggedIn}/>} />
-        <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut} />} />
-        <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded} build={CURRENT_BUILD} />} />
+        <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} handleInputChange={handleLoginInputChange} isLoggedIn={isLoggedIn} />} />
+        <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut}/>} />
+        <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded} build={CURRENT_BUILD}  setAccessToken = {setAccessToken} accessToken = {connection.accessToken}/>} />
         <Route exact path="/data" render={(props) => <Data {...props} players={players} DB_getPlayers={DB_getPlayers} />} />
         <Route exact path="/about" render={(props) => <About {...props} />} />
 
@@ -163,6 +170,36 @@ function App() {
       setHasDownloaded(false);		//Alter the state of 'hasDownloaded to false.
     }
   }
+  
+  function handleCopyAccessToken(target) {
+    if(target){
+      if(target.id !== "data-token"){
+        console.log("We did not click on the button");
+
+        handleCopyAccessToken(target.parentNode);
+      }
+      else{
+        const atr = target.getAttribute("data-token");
+
+        const dummyTextArea = document.createElement("textarea");
+
+        dummyTextArea.value = atr;
+        document.body.appendChild(dummyTextArea);
+        dummyTextArea.select();
+
+        document.execCommand('copy');
+        document.body.removeChild(dummyTextArea);
+
+        console.log("Copied to clipboard!");
+
+        setTimeout(() => {
+          setConnection({accessToken : null});
+        }, 2000)
+
+      }
+    }
+
+  };
 
   /*-----------------------*/
   /*--- Check Functions ---*/
