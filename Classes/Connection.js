@@ -20,6 +20,12 @@ module.exports = class Connection {
             console.warn("We have not connected to our mongoDB");
         }
 
+        socket.on("test", () => {
+            console.log(":-)  ".repeat(60));
+            console.log("test successful");
+            console.log(":-)  ".repeat(60));
+        })
+
         socket.on("disconnect", function () {
             server.onDisconnected(connection);
             connection.DB_deleteRef(connection, connection.player.id);
@@ -100,7 +106,6 @@ module.exports = class Connection {
             username: connection.player.username,
             connected: true
         }).then((data) => {
-            console.log(data);
             console.log("created reference to the player");
         })
     }
@@ -118,7 +123,6 @@ module.exports = class Connection {
         db.Player.deleteOne({
             connection_id: playerID
         }).then((data) => {
-            console.log(data);
             console.log(`"Removed reference to the player, ${playerID}"`);
         })
     }

@@ -6,7 +6,7 @@
 /*----NPM Imports----*/
 /*-------------------*/
 
-import React, { useState, useEffect, Component } from 'react';         //React Import
+import React, { useState, useEffect } from 'react';         //React Import
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { Auth } from "aws-amplify";							//AWS Amplify Authentication import
 import socketIOClient from "socket.io-client";
@@ -63,15 +63,24 @@ function App() {
     AUTHO_checkUser();
     checkIfDownloaded();
 
-    if(!connection.active){
-      setConnection({active : true});
+    // if(!connection.active){
+    //   setConnection({active : true});
   
-      const { endpoint } = connection;
+    //   const { endpoint } = connection;
   
-      const socket = socketIOClient(endpoint);
+    //   const socket = socketIOClient(endpoint);
+
+    //   socket.on("test", (data) => {
+    //       console.log("recieving test");
+    //   })
+    //   socket.on("test complete", (data) => {
+    //       console.log("recieving test complete!!!");
+    //   })
+
+    //   socket.emit("test");
   
-      console.log("We are trying to connect to server with Socket.io");  
-    }
+    //   console.log("We are trying to connect to server with Socket.io");  
+    // }
 
   }, []);
 

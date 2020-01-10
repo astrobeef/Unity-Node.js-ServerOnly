@@ -76,13 +76,6 @@ app.use(logger("dev"));
 // Serve up static assets (usually on heroku)
 app.use(express.static("client/build"));
 
-
-/*---------------------------*/
-/*Establish server connection*/
-/*---------------------------*/
-
-server.listen(PORT);        //Sets up our server to listen for events.
-
 /*------------------------*/
 /*--------Routing---------*/
 /*------------------------*/
@@ -121,32 +114,29 @@ let webInterval;
 //Upon a socket.io connection, do the following, passing in the 'socket' connection
 io.on("connection", function (iSocket/* The socket connecting */) {
 
-    console.log("~".repeat(60));
-    console.log("Log from web server :: Running connection to socket");;
-    console.log("~".repeat(60));
+    // if (!webInterval) {
+    //     webInterval = setInterval(() => {
+
+    //         iSocket.emit("test", "hello");
+    //     }, 1000, 0);
+    // }
+
+    // iSocket.on("test", (data) => {
+    //     iSocket.emit("test complete", "yay!");
+    // });
 
     const connection = cServer.onConnected(iSocket);             //Run the "onConnected" method on our server, passing in our 'socket' connection.  Establish a reference to the connection made with the socket.
 
     connection.db = require("./models");                                    //Set a reference, for our connection, to our database.
     connection.createEvents();                                              //Create the events for our connection.
     connection.socket.emit("register", { 'id': connection.player.id });         //Register our connection with the ID of our player, found from our connection.
-
-    if (!webInterval) {
-        webInterval = setInterval(() => {
-
-            iSocket.emit("test", "hello");
-            
-            console.log("Emit FromAPI");
-        }, 1000, 0);
-    }
-
-    iSocket.on("disconnect", () => {
-        console.log("~".repeat(60));
-        console.log("Log from web server :: Client disconnected");
-        console.log("~".repeat(60));
-    });
 });
 
+/*---------------------------*/
+/*Establish server connection*/
+/*---------------------------*/
+
+server.listen(PORT);        //Sets up our server to listen for events.
 
 
 /*-------------------------*/

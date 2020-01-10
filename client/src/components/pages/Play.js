@@ -27,7 +27,7 @@ function Play(props) {
               <a className = "winRAR" href="https://www.rarlab.com/rar/rarosx-5.8.0.tar.gz"> Mac </a>
 
               <h4 className="mt-5 mb-2">Download my Game!</h4>
-              <button for="download-link" type="button" className="btn btn-primary m-3">
+              <button htmlFor="download-link" type="button" className="btn btn-primary m-3">
                 <Link id="download-link" onClick={props.handleDownload}  to={buildString} target="_blank" download ><h3>Download</h3></Link>
               </button>
             </div>
