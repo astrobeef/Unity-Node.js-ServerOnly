@@ -1,0 +1,107 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  /* background-color: #282c34; */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.nav-link{
+  color: #3e1e30;
+}
+
+.nav-link:hover{
+  color: #f6e5b4;
+}
+
+.BG{
+
+  box-sizing: border-box; /*Not necessary in this situation*/
+  display: block; /*Not necessary, but we do want it this way*/
+  width: 100vw;  /*Not necessary, but we do want it this way*/
+  height: 100vh; /*Necessary.  100vh = 100% of the viewport height*/
+  padding: 0; /* No padding */
+  margin: 0; /* No margins */
+  background: url('./web-bg.png') no-repeat center center;  
+  /* Shorthand: image, repeat, X align, Y align. */
+  background-size: cover; /* Cover all available space*/
+}
+
+.btn{
+  color: #3e1e30;
+}
+
+.btn-primary{
+  background-color: #b95523;
+  border-style: none;
+}
+
+.btn:hover{
+  color: #f6e5b4;
+}
+
+.btn-primary:hover{
+  background-color: #3a8d68;
+  border-style: none;
+}
+
+Link{
+  color: #f6e5b4;
+}
+
+a{
+  color: #3e1e30;
+}
+
+a:hover{
+  color: #f6e5b4;
+}
+
+.winRAR{
+  color: #3ac588;
+}
+
+.header-light{
+  color: #f6e5b4;
+}
+
+.highlight{
+  text-decoration: underline;
+  color: #3ac588;
+}
+
+.light-yellow{
+  color: #f6e5b4;
+}

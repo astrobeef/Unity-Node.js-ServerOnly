@@ -1,0 +1,22 @@
+{
+    "local": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-unitynodeauth-local-181655-authRole",
+            "UnauthRoleArn": "arn:aws:iam::658095472941:role/amplify-unitynodeauth-local-181655-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::658095472941:role/amplify-unitynodeauth-local-181655-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "amplify-unitynodeauth-local-181655-deployment",
+            "UnauthRoleName": "amplify-unitynodeauth-local-181655-unauthRole",
+            "StackName": "amplify-unitynodeauth-local-181655",
+            "StackId": "arn:aws:cloudformation:us-west-2:658095472941:stack/amplify-unitynodeauth-local-181655/903ccf00-31b4-11ea-a6bb-02a1b3d9eece",
+            "AmplifyAppId": "d25fhv1bshus3l"
+        },
+        "categories": {
+            "auth": {
+                "unitynodeauth8acddaf0": {
+                    "hostedUIProviderCreds": "[]"
+                }
+            }
+        }
+    }
+}
