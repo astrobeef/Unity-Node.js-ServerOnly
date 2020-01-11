@@ -35,7 +35,7 @@ import API from "./utils/API";
 /*--Local Variables--*/
 /*-------------------*/
 
-const CURRENT_BUILD = "Buildv1.3-Heroku";		//The name of our current game build, found in /public/assets/game-builds/
+const CURRENT_BUILD = "Buildv1.5-H";		//The name of our current game build, found in /public/assets/game-builds/
 
 /*-------------------*/
 /*------- App -------*/
