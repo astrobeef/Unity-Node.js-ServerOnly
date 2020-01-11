@@ -31,7 +31,7 @@ module.exports = class Connection {
             console.log(dataUsername);
 
             server.onAttemptToJoinGame(connection);
-            connection.DB_alterRef(connection, connection.player.id, {"username" : dataUsername});
+            connection.DB_alterRef(connection, connection.player.id, { "username": dataUsername });
         });
 
         socket.on("fireBullet", function (unityData) {
@@ -55,6 +55,26 @@ module.exports = class Connection {
 
             socket.broadcast.to(connection.lobby.id).emit("updateRotation", player);
         });
+
+        socket.on("fetchUserByToken", function (accessToken) {
+
+
+            socket.emit("sendUserFromToken", "test");
+            
+            connection.DB_getAccessToken(connection, accessToken).then((DB_User) => {
+
+                if(DB_User){
+                    socket.emit("sendUserFromToken", DB_User);
+                }
+                else{
+                    socket.emit("sendUserFromToken", null);
+                    console.log("Could not find user with that token");
+                }
+
+            }).catch((err) => {
+                console.error(err);
+            })
+        })
 
         //If we do NOT have a DB reference, create one.
         if (!connection.DB_checkRef(connection, connection.player.id)) {
@@ -87,12 +107,57 @@ module.exports = class Connection {
         const db = require("../models");
 
         db.Player.update(
-            {connection_id : playerID},
-            {$set: alterData}
+            { connection_id: playerID },
+            { $set: alterData }
         ).then((data) => {
             console.log(data);
             console.log("Successfully updated player data");
         })
+    }
+
+    DB_getAccessToken(connection = Connection, accessToken) {
+        const db = require("../models");
+
+        return new Promise(function (resolve, reject) {
+
+            db.User.find(
+                { accessToken : connection.trimWeirdChars(accessToken.accessToken)}
+            )
+                .then((data) => {
+                    console.log(data);
+                    if(Object.keys(data).length > 0){
+                        resolve(JSON.stringify(data));
+                    }
+                    else{
+                        resolve(null);
+                    }
+                })
+                .catch((err) => reject(err));
+        })
+    }
+
+    /**
+     * 
+     * @param {String} string - Takes a string and trims weird characters.
+     * @returns a string without weird characters
+     */
+    trimWeirdChars(string = String){
+        let returnString = string.split("");
+
+        returnString = returnString.filter((char) => {
+            const charCode = char.charCodeAt(0);
+
+            if(charCode >= 32 && charCode <= 126){
+                return true;
+            }
+            else{
+                return false;
+            }
+        })
+        
+        returnString = returnString.join("").trim();
+
+        return returnString;
     }
 
 

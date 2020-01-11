@@ -7,4 +7,6 @@ router.route("/create")
 router.route("/:id")
     .get(usersController.findOne);
 
+router.route("/:id").put(usersController.updateOne);
+
 module.exports = router;

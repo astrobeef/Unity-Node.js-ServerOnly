@@ -48,8 +48,6 @@ export default {
     },
 
     createUser: function (userData) {
-        console.log(userData);
-        console.log("^^userData");
 
         return fetch(
             "api/users/create", {
@@ -75,7 +73,27 @@ export default {
             })
     },
 
-    updateUser: function () {
+    updateUser: function (username, payload) {
+        return fetch(
+            `/api/users/${username}`, {
+            method: "PUT",
+            body: JSON.stringify({...payload, username}),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(function (response) {
+                if (response.status !== 200) {
 
+                    return response.status;
+                }
+
+                return response.json().then(function (data) {
+                    return data;
+                })
+            })
+            .catch(function (err) {
+                console.log(`fetch error : ${err}`);
+            })
     }
 }

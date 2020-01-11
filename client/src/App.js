@@ -121,7 +121,7 @@ function App() {
       }
       )
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -131,52 +131,50 @@ function App() {
    */
   function DB_registerUser(username) {
 
-    console.log(`"Registering user, ${username}, to Mongo DB..."`);
-
     /*Check if the user is already registered*/ const DB_isRegistered = false; // For now, we assume no.
 
     const payload = { username };
 
     //CHECK IF USER IS REGISTERED
 
-    API.getUser(username)
-      .then((db_User) => {
-        console.log(db_User);
-        console.log("Found reference to user in MongoDB");
+    DB_getUser(username).then((DB_User) => {
 
-        DB_isRegistered = true;
-      }).catch((err) => {
-        console.log(err);
-      });
+      if (!DB_User) {
 
-    //REGISTER USER
+        console.log(`"Registering user, ${username}, to Mongo DB..."`);
+        //If we did not find the user, then create a reference.
+        API.createUser(payload)
+          .then((db_User) => {
+            console.log(db_User);
+            console.log("successfully created a user in our MongoDB!");
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      }
+      else {
+        console.log(`"User, ${username} is already registered"`);
+        //Do nothing; user is already registered in MongoDB.
+      }
 
-    if (!DB_isRegistered) {
+    }).catch((err) => {
 
-      API.createUser(payload)
-        .then((db_User) => {
-          console.log(db_User);
-          console.log("successfully created a user in our MongoDB!");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-
-    } else {
-      DB_updateUser(username);
-    }
+      console.log(err);
+    });
 
   };
 
   /**
    * Updates the access token of the user.
+   * @param {String} username - The user to be updated in the MongoDB.
+   * @param {Object} payload - The information to be changed.  Must match keys in the User Model.
    */
-  function DB_updateUser(username) {
+  function DB_updateUser(username, payload) {
 
-    API.updateUser(username)
+    API.updateUser(username, payload)
       .then((db_User) => {
         console.log(db_User);
-        console.log("successfully created a user in our MongoDB!");
+        console.log("Updated user data");
       })
       .catch((err) => {
         console.log(err);
@@ -184,15 +182,42 @@ function App() {
 
   }
 
+  /**
+   * Finds the user.  Returns true if the user is found, false if not.
+   * @param {string} username - The user to be found in the MongoDB.
+   */
+  function DB_getUser(username) {
+
+    return new Promise(function (resolve, reject) {
+
+      API.getUser(username)
+        .then((db_User) => {
+
+          if (db_User.length > 0) {
+            console.log(db_User);
+            console.log("Found reference to user in MongoDB");
+            resolve(JSON.stringify(db_User));
+          }
+          else {
+            resolve(null);
+          }
+
+        }).catch((err) => {
+          console.error(err);
+          reject(err);
+        });
+    })
+  }
+
   /*-----------------------*/
   /*-- Handler Functions --*/
   /*-----------------------*/
 
-	/** Handle Login Input Change
-	 * Updates the state of the login based on the input name and value
-	 * @param {Object} event - If an object, the change event fired when the input value is changed.
-	 * @param {String} event - If a string, the value to be set to the email.
-	 */
+  /** Handle Login Input Change
+   * Updates the state of the login based on the input name and value
+   * @param {Object} event - If an object, the change event fired when the input value is changed.
+   * @param {String} event - If a string, the value to be set to the email.
+   */
   function handleLoginInputChange(event) {
 
     const { target } = event;		//Pull the target off of our event.
@@ -205,10 +230,10 @@ function App() {
     setLoginInfo({ ...loginInfo, [name]: value });		//Set the key of 'name' to the value of 'value', so the user's input alters their login info.
   }
 
-	/** Handle Download
-	 * This does not download the game, but instead sets a reference within the local storage that we have downloaded the game.
-	 * @param {Object} event - The fired event from the action.
-	 */
+  /** Handle Download
+   * This does not download the game, but instead sets a reference within the local storage that we have downloaded the game.
+   * @param {Object} event - The fired event from the action.
+   */
   function handleDownload(event) {
 
     localStorage.setItem("hasDownloaded", true);		//Set an item in localStorage so we can reference it later to check if the user has downloaded the game.
@@ -219,10 +244,10 @@ function App() {
     }
   }
 
-	/** Handle Download Lost
-	 * This is fired if the user needs to download the game again.  The local storage 'hasDownloaded' item is removed.
-	 * @param {Object} event - The fired event from the action.
-	 */
+  /** Handle Download Lost
+   * This is fired if the user needs to download the game again.  The local storage 'hasDownloaded' item is removed.
+   * @param {Object} event - The fired event from the action.
+   */
   function handleDownloadLost(event) {
 
     localStorage.removeItem("hasDownloaded");		//Remove the item 'hasDownloaded' so we can reference it later to check that the user has NOT downloaded the game.
@@ -277,10 +302,10 @@ function App() {
   /*--- Check Functions ---*/
   /*-----------------------*/
 
-	/** Check If Downloaded
-	 * This function checks our local storage to see if the item 'hasDownloaded' exists.
-	 * Sets our state 'hasDownloaded' to the result of this check.
-	 */
+  /** Check If Downloaded
+   * This function checks our local storage to see if the item 'hasDownloaded' exists.
+   * Sets our state 'hasDownloaded' to the result of this check.
+   */
   function checkIfDownloaded() {
 
     const localHasDownload = localStorage.getItem("hasDownloaded");		//Get, and set a reference to, the item 'hasDownloaded', if it exists.
@@ -297,10 +322,10 @@ function App() {
     }
   }
 
-	/** Check if Registered
-	 * Upon start up, checks if the user is logged in by checking the local storage.
-	 * @returns true if the user is logged in, false if not.
-	 */
+  /** Check if Registered
+   * Upon start up, checks if the user is logged in by checking the local storage.
+   * @returns true if the user is logged in, false if not.
+   */
   function checkIfRegistered() {
 
     const localLogin = localStorage.getItem("registered");		//Get, and set a reference to, item 'registered', if it exists.
@@ -318,10 +343,10 @@ function App() {
   /*------ AWS Autho ------*/
   /*-----------------------*/
 
-	/**
-	 * Uses AWS Amplify to sign in a returning user.
-	 * @param {Object} event - The event fired with the action.
-	 */
+  /**
+   * Uses AWS Amplify to sign in a returning user.
+   * @param {Object} event - The event fired with the action.
+   */
   function AUTHO_signIn(event) {
     event.preventDefault();		//Prevent the default action of the event.
 
@@ -360,20 +385,30 @@ function App() {
         const password = loginInfo.password;
         const email = loginInfo.email;
 
-        //Use AWS Amplify to attempt to sign up the user.
-        Auth.signUp({
-          username,
-          password,
-          attributes: {
-            email
+        DB_getUser(username).then((DB_User) => {
+
+          if (!DB_User) {
+            //Use AWS Amplify to attempt to sign up the user.
+            Auth.signUp({
+              username,
+              password,
+              attributes: {
+                email
+              }
+            }).then((user) => {
+              AUTHO_UponSuccessfulSignIn(username);
+            })
+              .catch((err) => {
+                console.log(err);
+                console.warn("Could not log in");
+              });
           }
-        }).then((user) => {
-          AUTHO_UponSuccessfulSignIn(username);
+          else {
+            alert("Username is taken");
+          }
+        }).catch((err) => {
+          console.log(err);
         })
-          .catch((err) => {
-            console.log(err);
-            console.warn("Could not log in");
-          });
       }
       else {
         console.warn("We do not have a filled username, password, and/or, email");
@@ -447,9 +482,15 @@ function App() {
 
     Auth.currentSession().then((sessionData) => {
 
+
+      console.log("setting access token");
+      console.log("^".repeat(60));
+
       const accessToken = sessionData.getAccessToken().getJwtToken();
 
       setConnection({ ...connection, "accessToken": accessToken });
+
+      DB_updateUser(username, {accessToken});
 
       DB_registerUser(username);
 
@@ -460,7 +501,7 @@ function App() {
     }).catch((err) => {
       console.error(err);
 
-      console.err("Could not get current session data");
+      console.error("Could not get current session data");
     })
   }
 
