@@ -169,4 +169,10 @@ function DB_WipeOnStart() {
         console.log(`Removed Player collection from DB ...`);
         console.log(data);
     })
+
+    db.Messages.remove({}, function(err, data){
+        if(err) throw err;
+        console.log(`Removed Messages collection from DB ...`);
+        console.log(data);
+    })
 }

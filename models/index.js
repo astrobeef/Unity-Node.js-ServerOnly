@@ -1,4 +1,5 @@
 module.exports = {
     Player : require("./player"),
-    User : require("./user")
+    User : require("./user"),
+    Messages : require("./messages")
 };

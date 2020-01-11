@@ -9,7 +9,7 @@
 import React, { useState, useEffect } from 'react';         //React Import
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { Auth } from "aws-amplify";							//AWS Amplify Authentication import
-import socketIOClient from "socket.io-client";
+// import socketIOClient from "socket.io-client";
 
 /*-------------------*/
 /*---Local Imports---*/
@@ -35,7 +35,7 @@ import API from "./utils/API";
 /*--Local Variables--*/
 /*-------------------*/
 
-const CURRENT_BUILD = "Buildv1.3-Heroku";		//The name of our current game build, found in /public/assets/game-builds/
+const CURRENT_BUILD = "Buildv1.5-H";		//The name of our current game build, found in /public/assets/game-builds/
 
 /*-------------------*/
 /*------- App -------*/
@@ -50,27 +50,28 @@ function App() {
 
   const [players, setPlayers] = useState([]);						//The players connected to the server
 
-  const [loginInfo, setLoginInfo] = useState({ name: "login" });	//The user's login information: username, password.
+  const [loginInfo, setLoginInfo] = useState({ name: "login", message : "" });	//The user's login information: username, password.
 
   const [hasDownloaded, setHasDownloaded] = useState(false);		//A boolean value whether the user has downloaded the game or not.
 
   const [connection, setConnection] = useState({ active: false });
 
+  const [messages, setMessages] = useState(null);
+
   //---Use Effect
   //-------Runs when state changes.
   useEffect(() => {
-    console.log("Using effect");
     AUTHO_checkUser();
     checkIfDownloaded();
 
-    // if (!connection.active) {
-    //   setConnection({ ...connection, active: true });
+    if (!connection.active) {
+      setConnection({ ...connection, active: true });
 
-    //   setInterval(() => {
-    //     DB_getPlayers();
-    //     console.log(connection);
-    //   }, 10000);
-    // }
+      setInterval(() => {
+        DB_getPlayers();
+        DB_getMessages();
+      }, 10000);
+    }
 
   }, []);
 
@@ -79,7 +80,6 @@ function App() {
     event.persist();
 
     if (!connection.accessToken) {
-
       AUTHO_SetAccessToken(loginInfo.username, event);
     }
     else {
@@ -97,7 +97,7 @@ function App() {
         <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} signUp={AUTHO_signUp} handleInputChange={handleLoginInputChange} isLoggedIn={isLoggedIn} handleHasRegistered={handleHasRegistered} />} />
         <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut} />} />
         <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded} build={CURRENT_BUILD} setAccessToken={setAccessToken} displaySuccess={connection.displaySuccess} />} />
-        <Route exact path="/data" render={(props) => <Data {...props} players={players} DB_getPlayers={DB_getPlayers} />} />
+        <Route exact path="/data" render={(props) => <Data {...props} players={players} DB_getPlayers={DB_getPlayers} generateMessages={generateMessages} DB_getMessages={DB_getMessages} handleInputChange={handleLoginInputChange} message = {loginInfo.message} handleSendMessage = {handleSendMessage}/>} />
         <Route exact path="/about" render={(props) => <About {...props} />} />
 
         <Route path="/*" render={(props) => { if (!isLoggedIn) return (<Redirect to="/login"></Redirect>) }} />
@@ -105,6 +105,15 @@ function App() {
     </div>
 
   );
+
+  function generateMessages() {
+    if(messages && messages[0].message.trim().length > 1){
+      return messages.map(message => <li key={Math.random()} className="list-group-item"><b>{message.username} : </b>{message.message}</li>);
+    }
+    else{
+      return null;
+    }
+  }
 
   /*------------------------*/
   /*-- Database Functions --*/
@@ -116,7 +125,6 @@ function App() {
   function DB_getPlayers() {
     API.getPlayers()	//Call the getPlayers() method off of our API object, which was imported from Utils.
       .then((db_players) => {		//Then, with the retrieved data, ...
-        console.log(db_players);
         setPlayers(db_players);		//Set our players state to the retrieved data.
       }
       )
@@ -140,20 +148,15 @@ function App() {
     DB_getUser(username).then((DB_User) => {
 
       if (!DB_User) {
-
-        console.log(`"Registering user, ${username}, to Mongo DB..."`);
         //If we did not find the user, then create a reference.
         API.createUser(payload)
           .then((db_User) => {
-            console.log(db_User);
-            console.log("successfully created a user in our MongoDB!");
           })
           .catch((err) => {
             console.error(err);
           });
       }
       else {
-        console.log(`"User, ${username} is already registered"`);
         //Do nothing; user is already registered in MongoDB.
       }
 
@@ -173,8 +176,6 @@ function App() {
 
     API.updateUser(username, payload)
       .then((db_User) => {
-        console.log(db_User);
-        console.log("Updated user data");
       })
       .catch((err) => {
         console.log(err);
@@ -194,8 +195,6 @@ function App() {
         .then((db_User) => {
 
           if (db_User.length > 0) {
-            console.log(db_User);
-            console.log("Found reference to user in MongoDB");
             resolve(JSON.stringify(db_User));
           }
           else {
@@ -208,6 +207,35 @@ function App() {
         });
     })
   }
+
+  function DB_getMessages() {
+    return new Promise(function (resolve, reject) {
+
+      API.getMessages()
+        .then((db_Messages) => {
+          if (db_Messages && db_Messages.length > 0) {
+            if(db_Messages.length > 5){
+              console.log("Too many messages in MongoDB to display them all");
+              setMessages(db_Messages.slice(db_Messages.length - 5, db_Messages.length));
+            }
+            else{
+              setMessages(db_Messages);
+            }
+          }
+
+          resolve(db_Messages);
+        })
+        .catch((err) => {
+          console.error(err);
+          reject(err);
+        });
+
+    })
+  };
+
+  function DB_createMessage(username) {
+
+  };
 
   /*-----------------------*/
   /*-- Handler Functions --*/
@@ -223,9 +251,6 @@ function App() {
     const { target } = event;		//Pull the target off of our event.
     const value = target.value;		//Set a reference for our target's value (the user's input).
     const { name } = target;		//Pull the name off of our target (the element to be changed by the input).
-
-    console.log(`value : ${value}`);
-    console.log(`name : ${name}`);
 
     setLoginInfo({ ...loginInfo, [name]: value });		//Set the key of 'name' to the value of 'value', so the user's input alters their login info.
   }
@@ -296,6 +321,19 @@ function App() {
    */
   function handleHasRegistered() {
     setIsRegistered(true);
+  }
+
+  function handleSendMessage(event) {
+    const inputMessage = {username : loginInfo.username, message : loginInfo.message};
+
+    if(inputMessage.message.trim().length > 2){
+
+      API.createMessage(inputMessage);
+      setLoginInfo({...loginInfo, message : ""});
+    }
+    else{
+      console.log("Message was too short.  Did not send");
+    }
   }
 
   /*-----------------------*/
@@ -482,15 +520,11 @@ function App() {
 
     Auth.currentSession().then((sessionData) => {
 
-
-      console.log("setting access token");
-      console.log("^".repeat(60));
-
       const accessToken = sessionData.getAccessToken().getJwtToken();
 
       setConnection({ ...connection, "accessToken": accessToken });
 
-      DB_updateUser(username, {accessToken});
+      DB_updateUser(username, { accessToken });
 
       DB_registerUser(username);
 
