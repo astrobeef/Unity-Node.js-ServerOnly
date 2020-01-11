@@ -46,6 +46,7 @@ module.exports = class Connection {
             player.position.y = unityData.position.y;
             player.position.z = unityData.position.z;
 
+            console.log(player);
             socket.broadcast.to(connection.lobby.id).emit("updatePosition", player);
         });
 
@@ -57,17 +58,16 @@ module.exports = class Connection {
         });
 
         socket.on("fetchUserByToken", function (accessToken) {
-
-
-            socket.emit("sendUserFromToken", "test");
             
-            connection.DB_getAccessToken(connection, accessToken).then((DB_User) => {
+            connection.DB_getUserByToken(connection, accessToken).then((DB_User) => {
 
                 if(DB_User){
+                    console.log("Sending DB_User to Unity");
+                    console.log(DB_User);
                     socket.emit("sendUserFromToken", DB_User);
                 }
                 else{
-                    socket.emit("sendUserFromToken", null);
+                    socket.emit("sendUserFromToken", {});
                     console.log("Could not find user with that token");
                 }
 
@@ -115,7 +115,7 @@ module.exports = class Connection {
         })
     }
 
-    DB_getAccessToken(connection = Connection, accessToken) {
+    DB_getUserByToken(connection = Connection, accessToken) {
         const db = require("../models");
 
         return new Promise(function (resolve, reject) {
@@ -125,8 +125,8 @@ module.exports = class Connection {
             )
                 .then((data) => {
                     console.log(data);
-                    if(Object.keys(data).length > 0){
-                        resolve(JSON.stringify(data));
+                    if(data.length > 0){
+                        resolve(data[0]);
                     }
                     else{
                         resolve(null);
