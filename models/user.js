@@ -10,6 +10,10 @@ const UserSchema = new Schema({
     connected: {
         type: Boolean,
         required: true
+    },
+    accessToken: {
+        type: String,
+        required: true
     }
 });
 
