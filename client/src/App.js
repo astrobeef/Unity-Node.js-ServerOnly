@@ -426,6 +426,14 @@ function App() {
         DB_getUser(username).then((DB_User) => {
 
           if (!DB_User) {
+
+            Auth.federatedSignIn().then((user) => {
+              
+              AUTHO_UponSuccessfulSignIn(username);
+            })
+
+            return;
+
             //Use AWS Amplify to attempt to sign up the user.
             Auth.signUp({
               username,
@@ -434,6 +442,9 @@ function App() {
                 email
               }
             }).then((user) => {
+              
+              setIsLoggedIn("needs verification");
+
               AUTHO_UponSuccessfulSignIn(username);
             })
               .catch((err) => {
@@ -534,6 +545,8 @@ function App() {
 
     }).catch((err) => {
       console.error(err);
+
+      alert("We could not get your user information.  Have you verified your email?");
 
       console.error("Could not get current session data");
     })
