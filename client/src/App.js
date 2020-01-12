@@ -415,6 +415,13 @@ function App() {
    * @param {Object} event - The event fired with the action.
    */
   function AUTHO_signUp(event) {
+    
+
+    Auth.federatedSignIn().then((user) => {
+              
+      AUTHO_UponSuccessfulSignIn(username);
+    })
+    return;
 
     if (loginInfo /* Updated upon user input */) {
       //If we have a username and password, then...
