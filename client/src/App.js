@@ -416,12 +416,17 @@ function App() {
    */
   function AUTHO_signUp(event) {
     
-
-    Auth.federatedSignIn().then((user) => {
-              
-      AUTHO_UponSuccessfulSignIn(username);
-    })
-    return;
+if(loginInfo.username){
+  Auth.federatedSignIn().then((user) => {
+            
+    AUTHO_UponSuccessfulSignIn(loginInfo.username);
+  })
+  return;
+}
+else{
+  alert("Enter a username");
+  return;
+}
 
     if (loginInfo /* Updated upon user input */) {
       //If we have a username and password, then...
