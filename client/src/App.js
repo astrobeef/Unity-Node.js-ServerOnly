@@ -46,6 +46,8 @@ function App() {
   //---State
 
   const [isLoggedIn, setIsLoggedIn] = useState([]);				//A boolean value whether the user is logged in or not.
+  const [needsVerify, setNeedsVerify] = useState(false);
+
   const [isRegistered, setIsRegistered] = useState(false);      	//A boolean value whether the user has registered or not.
 
   const [players, setPlayers] = useState([]);						//The players connected to the server
@@ -94,7 +96,7 @@ function App() {
       <Router>
 
         <NavTabs isLoggedIn={isLoggedIn ? true : false} />
-        <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} signUp={AUTHO_signUp} handleInputChange={handleLoginInputChange} isLoggedIn={isLoggedIn} handleHasRegistered={handleHasRegistered} />} />
+        <Route exact path="/login" render={(props) => <Login {...props} isRegistered={isRegistered ? true : false} signIn={AUTHO_signIn} signUp={AUTHO_signUp} handleInputChange={handleLoginInputChange} isLoggedIn={isLoggedIn} handleHasRegistered={handleHasRegistered} needsVerify={needsVerify} handleVerify = {handleVerify} handleResendVerification = {handleResendVerification}/>} />
         <Route exact path="/home" render={(props) => <Home {...props} signOut={AUTHO_signOut} />} />
         <Route exact path="/play" render={(props) => <Play {...props} handleDownload={handleDownload} handleDownloadLost={handleDownloadLost} hasDownloaded={hasDownloaded} build={CURRENT_BUILD} setAccessToken={setAccessToken} displaySuccess={connection.displaySuccess} />} />
         <Route exact path="/data" render={(props) => <Data {...props} players={players} DB_getPlayers={DB_getPlayers} generateMessages={generateMessages} DB_getMessages={DB_getMessages} handleInputChange={handleLoginInputChange} message = {loginInfo.message} handleSendMessage = {handleSendMessage}/>} />
@@ -248,9 +250,14 @@ function App() {
    */
   function handleLoginInputChange(event) {
 
+
     const { target } = event;		//Pull the target off of our event.
     const value = target.value;		//Set a reference for our target's value (the user's input).
     const { name } = target;		//Pull the name off of our target (the element to be changed by the input).
+
+    
+    console.log(name);
+    console.log(value);
 
     setLoginInfo({ ...loginInfo, [name]: value });		//Set the key of 'name' to the value of 'value', so the user's input alters their login info.
   }
@@ -336,6 +343,32 @@ function App() {
     }
   }
 
+  function handleVerify(event){
+    event.preventDefault();
+
+    Auth.confirmSignUp(loginInfo.username, loginInfo.verification).then(() => {
+      console.log(loginInfo.verification);
+      console.log("Successfully verified");
+      setIsLoggedIn(true);
+      setNeedsVerify(false);
+
+      AUTHO_UponSuccessfulSignIn(loginInfo.username);
+
+    }).catch( e => {
+      console.log("Failed to verify");
+      console.error(e);
+    })
+  }
+
+  function handleResendVerification(event){
+    event.preventDefault();
+
+    Auth.resendSignUp(loginInfo.username).then(() => {
+      console.log("Successfully resent code");
+    });
+
+  }
+
   /*-----------------------*/
   /*--- Check Functions ---*/
   /*-----------------------*/
@@ -415,18 +448,7 @@ function App() {
    * @param {Object} event - The event fired with the action.
    */
   function AUTHO_signUp(event) {
-    
-if(loginInfo.username){
-  Auth.federatedSignIn().then((user) => {
-            
-    AUTHO_UponSuccessfulSignIn(loginInfo.username);
-  })
-  return;
-}
-else{
-  alert("Enter a username");
-  return;
-}
+  
 
     if (loginInfo /* Updated upon user input */) {
       //If we have a username and password, then...
@@ -439,13 +461,6 @@ else{
 
           if (!DB_User) {
 
-            Auth.federatedSignIn().then((user) => {
-              
-              AUTHO_UponSuccessfulSignIn(username);
-            })
-
-            return;
-
             //Use AWS Amplify to attempt to sign up the user.
             Auth.signUp({
               username,
@@ -454,10 +469,11 @@ else{
                 email
               }
             }).then((user) => {
-              
-              setIsLoggedIn("needs verification");
 
-              AUTHO_UponSuccessfulSignIn(username);
+              console.log("Signing up user");
+
+              setNeedsVerify(true);
+
             })
               .catch((err) => {
                 console.log(err);

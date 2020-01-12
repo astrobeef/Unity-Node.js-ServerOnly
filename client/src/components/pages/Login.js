@@ -10,6 +10,21 @@ function Login(props) {
     <div className="App">
       <header className={props.isLoggedIn ? "App-header" : "App-header bg-blue"}>
 
+        {props.needsVerify ? <div>
+
+          <h1>Enter Verification code from your email</h1>
+
+          <input type="verification" className="form-control" id="verification" placeholder="Verification code" name="verification" onChange={props.handleInputChange}></input>
+
+                <button type="submit" value="Submit" className="btn btn-primary mt-2 mr-3" onClick={props.handleVerify}><h2>Submit Code</h2></button>
+
+                <button type="submit" value="Submit" className="btn btn-primary mt-2 ml-3" onClick={props.handleResendVerification}><h2>Submit Code</h2></button>
+                
+
+        </div>
+        : 
+
+          <div>
         {props.isLoggedIn ? <Link to="/about">About</Link> :
           props.isRegistered ?
             <div><h1 className="header-light"> Welcome back!</h1>
@@ -48,7 +63,8 @@ function Login(props) {
               <button type="submit" value="Submit" className="btn btn-primary" onClick={props.handleHasRegistered}><h4>Sign in</h4></button>
             </div>
 
-        }
+        }</div>
+      }
 
 
       </header>
