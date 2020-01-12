@@ -46,13 +46,14 @@ module.exports = class Connection {
             player.position.y = unityData.position.y;
             player.position.z = unityData.position.z;
 
-            console.log(player);
             socket.broadcast.to(connection.lobby.id).emit("updatePosition", player);
         });
 
         socket.on("updateRotation", function (unityData) {
             player.tankRotation = unityData.tankRotation;
             player.barrelRotation = unityData.barrelRotation;
+
+            console.log("Updating rotation");
 
             socket.broadcast.to(connection.lobby.id).emit("updateRotation", player);
         });

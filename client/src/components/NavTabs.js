@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 
 function NavTabs(props) {
 
-    console.log(props);
-
     if (!props.isLoggedIn) {
         return null;
     }

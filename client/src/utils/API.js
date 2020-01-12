@@ -77,11 +77,46 @@ export default {
         return fetch(
             `/api/users/${username}`, {
             method: "PUT",
-            body: JSON.stringify({...payload, username}),
+            body: JSON.stringify({ ...payload, username }),
             headers: {
                 "Content-Type": "application/json"
             }
         })
+            .then(function (response) {
+                if (response.status !== 200) {
+
+                    return response.status;
+                }
+
+                return response.json().then(function (data) {
+                    return data;
+                })
+            })
+            .catch(function (err) {
+                console.log(`fetch error : ${err}`);
+            })
+    },
+    getMessages: function () {
+
+        return fetch("api/messages")
+            .then(function (response) {
+                return response.json().then(function (data) {
+                    return data;
+                })
+            })
+            .catch(function (err) {
+                console.log(`fetch error : ${err}`);
+            })
+    },
+    createMessage: function (payload) {
+        return fetch("/api/messages/create", {
+            method: "POST",
+            body: JSON.stringify(payload),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+        )
             .then(function (response) {
                 if (response.status !== 200) {
 

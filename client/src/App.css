@@ -110,3 +110,21 @@ a:hover{
   background-color: #041621;
   background-image: none;
 }
+
+.mt-20{
+  margin-top : 250px;
+}
+
+.list-group-item{
+  color: #b95523;
+  background-color: #3e1e30;
+}
+
+#message-input{
+  color: #f6e5b4;
+  background-color: #3a8d68;
+}
+
+#message-input::placeholder{
+  color: #f6e5b4;
+}
