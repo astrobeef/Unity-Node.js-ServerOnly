@@ -113,8 +113,6 @@ object-assign
 
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 
-/*! https://mths.be/utf8js v2.1.2 by @mathias */
-
 /** @license React v16.12.0
  * react-is.production.min.js
  *
