@@ -31,6 +31,8 @@ module.exports = class Connection {
             console.log(dataUsername);
 
             server.onAttemptToJoinGame(connection);
+            
+            connection.player.username = dataUsername;
             API.updatePlayer(connection.player.id, { "username": dataUsername }).catch(err => console.error(err));
         });
 
@@ -61,7 +63,15 @@ module.exports = class Connection {
         });
 
         socket.on("sendMessage", function(message){
-            DB_handleMessageSend(message).catch(err => console.error(err));
+
+            const message_str = message.message;
+            console.log(`"Successfully fired event to send message : ${message_str}"`);
+            if(message_str !== null){
+                DB_handleMessageSend(connection.player.username, message_str).catch(err => console.error(err));
+            }
+            else{
+                console.warn("Sent message was empty");
+            }
         })
 
         socket.on("newMessage", () => {
@@ -113,9 +123,9 @@ function DB_handleUserByTokenFetch(connection = Connection, accessToken = String
     })
 }
 
-function DB_handleMessageSend(message){
+function DB_handleMessageSend(username, message){
     return new Promise((resolve, reject) => {
-        API.sendMessage(connection.player.username, message).then(creationInfo => {
+        API.sendMessage(username, message).then(creationInfo => {
             console.log(creationInfo);
 
             //Do something now that we've sent the message.

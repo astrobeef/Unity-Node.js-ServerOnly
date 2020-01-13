@@ -93,9 +93,14 @@ module.exports = {
     },
     sendMessage: function(username, message){
         return new Promise((resolve, reject) => {
+
+            if(typeof(message) !== "string"){
+                reject(`ERROR : "Message, ${message}, was not of type 'string'"`);
+            }
+
             db.Messages.create({
-                username,
-                message
+                username : username,
+                message : message
             }).then((creationInfo) => {
                 resolve(creationInfo);
             }).catch(err => reject(err));
