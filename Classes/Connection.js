@@ -1,11 +1,17 @@
+
+const API = require("./API/API");
+
 module.exports = class Connection {
     constructor() {
         this.socket;
         this.player;
         this.server;
         this.lobby;
-        this.db;
     }
+
+    /*----------------------------------------*/
+    /*----- CREATE EVENTS FOR CONNECTION -----*/
+    /*----------------------------------------*/
 
     //Handles all our io events and where we should route them to be handled
     createEvents() {
@@ -13,16 +19,10 @@ module.exports = class Connection {
         const socket = connection.socket;
         const server = connection.server;
         const player = connection.player;
-        if (this.db) {
-            console.log("We have made a connection to our MongoDB");
-        }
-        else {
-            console.warn("We have not connected to our mongoDB");
-        }
 
         socket.on("disconnect", function () {
             server.onDisconnected(connection);
-            connection.DB_deleteRef(connection, connection.player.id);
+            API.deletePlayer(connection.player.id);
         });
 
         socket.on("joinGame", function (unityData) {
@@ -31,7 +31,7 @@ module.exports = class Connection {
             console.log(dataUsername);
 
             server.onAttemptToJoinGame(connection);
-            connection.DB_alterRef(connection, connection.player.id, { "username": dataUsername });
+            API.updatePlayer(connection.player.id, { "username": dataUsername }).catch(err => console.error(err));
         });
 
         socket.on("fireBullet", function (unityData) {
@@ -53,144 +53,75 @@ module.exports = class Connection {
             player.tankRotation = unityData.tankRotation;
             player.barrelRotation = unityData.barrelRotation;
 
-            console.log("Updating rotation");
-
             socket.broadcast.to(connection.lobby.id).emit("updateRotation", player);
         });
 
         socket.on("fetchUserByToken", function (accessToken) {
-            
-            connection.DB_getUserByToken(connection, accessToken).then((DB_User) => {
-
-                if(DB_User){
-                    console.log("Sending DB_User to Unity");
-                    console.log(DB_User);
-                    socket.emit("sendUserFromToken", DB_User);
-                }
-                else{
-                    socket.emit("sendUserFromToken", {});
-                    console.log("Could not find user with that token");
-                }
-
-            }).catch((err) => {
-                console.error(err);
-            })
+            DB_handleUserByTokenFetch(connection, accessToken).catch(err => console.error(err));
         })
 
         //If we do NOT have a DB reference, create one.
-        if (!connection.DB_checkRef(connection, connection.player.id)) {
-            connection.DB_createRef(connection, connection.player.id);
-        }
+
+        DB_checkRef(connection.player.id).then((foundRef) => {
+            if (!foundRef) {
+                API.createPlayer(connection.player.username, connection.player.id)
+                    .then(creationInfo => console.log(creationInfo))
+                    .catch(error => console.error(error));
+            }
+        }).catch(err => console.log(err));
     }
+}
 
-    /**
-     * This checks if our MongoDB has a stored reference of this connection
-     * @param {Connection} connection - Our connection
-     * @param {String} playerID - The ID of our connected player (connection.player.id)
-     * @returns - Returns true if this connection exists within the Database, false if not
-     */
-    DB_checkRef(connection = Connection, playerID = String) {
-        const db = require("../models");
+/*-------------------*/
+/*----- METHODS -----*/
+/*-------------------*/
 
-        db.Player.find({ connection_id: playerID }, (err, data) => {
-            if (err) throw err;
+/**
+ * Promise - Emits event if user is found.  Emits empty event if not.
+ * @param {Connection} connection - Our current connection.
+ * @param {String} accessToken - The accessToken sent from Unity client.
+ * @returns Promise true/false if user is found.
+ */
+function DB_handleUserByTokenFetch(connection = Connection, accessToken = String) {
 
-            if (data.length > 0) {
-                return true;
+    return new Promise((resolve, reject) => {
+        API.getUserByToken(accessToken).then((DB_User) => {
+
+            if (DB_User) {
+                connection.socket.emit("sendUserFromToken", DB_User);
+                resolve(true);
             }
             else {
-                return false;
+                connection.socket.emit("sendUserFromToken", {});
+                console.warn("Could not find user with that token");
+                resolve(false);
             }
+
+        }).catch((err) => {
+            console.error(err);
+            reject(err);
         })
-    }
+    })
+}
 
-    DB_alterRef(connection = Connection, playerID = String, alterData = Object) {
-        const db = require("../models");
+/**
+ * This checks if our MongoDB has a stored reference of this connection
+ * @param {String} playerID - The ID of our connected player (connection.player.id)
+ * @returns - Returns promise true/false if reference is found.
+ */
+function DB_checkRef(playerID = String) {
+    return new Promise((resolve, reject) => {
 
-        db.Player.update(
-            { connection_id: playerID },
-            { $set: alterData }
-        ).then((data) => {
-            console.log(data);
-            console.log("Successfully updated player data");
-        })
-    }
-
-    DB_getUserByToken(connection = Connection, accessToken) {
-        const db = require("../models");
-
-        return new Promise(function (resolve, reject) {
-
-            db.User.find(
-                { accessToken : connection.trimWeirdChars(accessToken.accessToken)}
-            )
-                .then((data) => {
-                    console.log(data);
-                    if(data.length > 0){
-                        resolve(data[0]);
-                    }
-                    else{
-                        resolve(null);
-                    }
-                })
-                .catch((err) => reject(err));
-        })
-    }
-
-    /**
-     * 
-     * @param {String} string - Takes a string and trims weird characters.
-     * @returns a string without weird characters
-     */
-    trimWeirdChars(string = String){
-        let returnString = string.split("");
-
-        returnString = returnString.filter((char) => {
-            const charCode = char.charCodeAt(0);
-
-            if(charCode >= 32 && charCode <= 126){
-                return true;
+        API.getPlayer(playerID).then((DB_playerData) => {
+            if (DB_playerData) {
+                resolve(true);
             }
-            else{
-                return false;
+            else {
+                resolve(false);
             }
-        })
-        
-        returnString = returnString.join("").trim();
-
-        return returnString;
-    }
-
-
-    /**
-     * This creates a reference to our Mongo DB for this connection, based on the player's ID
-     * @param {Connection} connection - Our connection
-     * @param {String} playerID - The ID of our connected player (connection.player.id)
-     */
-    DB_createRef(connection = Connection, playerID = String) {
-        const db = require("../models");
-
-        db.Player.create({
-            connection_id: playerID,
-            username: connection.player.username,
-            connected: true
-        }).then((data) => {
-            console.log("created reference to the player");
-        })
-    }
-
-    /**
-     * 
-     * @param {Connection} connection - The connection (player) disconnecting from the game server.
-     * @param {String} playerID - The ID of the player, from the connection (connection.player.id)
-     */
-    DB_deleteRef(connection = Connection, playerID = String) {
-        const db = require("../models");
-
-        db.Player.deleteOne({
-            connection_id: playerID
-        }).then((data) => {
-            console.log(`"Removed reference to the player, ${playerID}"`);
-        })
-    }
+        }).catch((err) => {
+            console.error(err);
+            reject(err);
+        });
+    })
 }
