@@ -58,10 +58,19 @@ module.exports = class Connection {
 
         socket.on("fetchUserByToken", function (accessToken) {
             DB_handleUserByTokenFetch(connection, accessToken).catch(err => console.error(err));
+        });
+
+        socket.on("sendMessage", function(message){
+            DB_handleMessageSend(message).catch(err => console.error(err));
+        })
+
+        socket.on("newMessage", () => {
+            console.log("A message has been sent by another user.");
+
+            DB_handleNewMessage().catch(err => console.error(err));
         })
 
         //If we do NOT have a DB reference, create one.
-
         DB_checkRef(connection.player.id).then((foundRef) => {
             if (!foundRef) {
                 API.createPlayer(connection.player.username, connection.player.id)
@@ -72,9 +81,9 @@ module.exports = class Connection {
     }
 }
 
-/*-------------------*/
-/*----- METHODS -----*/
-/*-------------------*/
+/*---------------------------*/
+/*----- HANDLER METHODS -----*/
+/*---------------------------*/
 
 /**
  * Promise - Emits event if user is found.  Emits empty event if not.
@@ -103,6 +112,43 @@ function DB_handleUserByTokenFetch(connection = Connection, accessToken = String
         })
     })
 }
+
+function DB_handleMessageSend(message){
+    return new Promise((resolve, reject) => {
+        API.sendMessage(connection.player.username, message).then(creationInfo => {
+            console.log(creationInfo);
+
+            //Do something now that we've sent the message.
+            //Emit broadcast that a message has been sent.
+            console.log("Emit broadcast that a message has been sent");
+            resolve(true);
+
+        }).catch(err => {
+            
+            console.error("The message could not be sent");
+
+            reject(err);
+        });
+    })
+}
+
+function DB_handleNewMessage(){
+    return new Promise((resolve, reject) => {
+        API.getMessages().then(DB_Messages => {
+            //Do something here now that we have the messages.
+            console.log("Emit to self that we have new messages... Unity will need a listen for this");
+        }).catch(err => {
+            console.error("Could not get messages");
+
+            reject(err);
+        })
+    })
+}
+
+
+/*---------------------------*/
+/*----- CHECK METHODS -----*/
+/*---------------------------*/
 
 /**
  * This checks if our MongoDB has a stored reference of this connection

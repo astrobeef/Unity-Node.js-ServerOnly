@@ -90,6 +90,29 @@ module.exports = {
                 resolve(deletionInfo);
             }).catch(err => reject(err));
         })
+    },
+    sendMessage: function(username, message){
+        return new Promise((resolve, reject) => {
+            db.Messages.create({
+                username,
+                message
+            }).then((creationInfo) => {
+                resolve(creationInfo);
+            }).catch(err => reject(err));
+        })
+    },
+    getMessages: function(){
+        return new Promise((resolve, reject) => {
+            db.Messages.find({})
+            .then((DB_Messages) => {
+                if(DB_Messages.length > 0){
+                    resolve(DB_Messages);
+                }else{
+                    console.warn("Could not find any messages");
+                    resolve(false);
+                }
+            }).catch(err => reject(err));
+        })
     }
 }
 
