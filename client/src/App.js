@@ -35,7 +35,7 @@ import API from "./utils/API";
 /*--Local Variables--*/
 /*-------------------*/
 
-const CURRENT_BUILD = "Buildv1.7-H";		//The name of our current game build, found in /public/assets/game-builds/
+const CURRENT_BUILD = "Game-Buildv2.0";		//The name of our current game build, found in /public/assets/game-builds/
 
 /*-------------------*/
 /*------- App -------*/
