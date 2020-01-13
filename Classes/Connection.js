@@ -22,7 +22,6 @@ module.exports = class Connection {
 
         socket.on("disconnect", function () {
             server.onDisconnected(connection);
-            API.deletePlayer(connection.player.id);
         });
 
         socket.on("joinGame", function (unityData) {
@@ -33,7 +32,6 @@ module.exports = class Connection {
             server.onAttemptToJoinGame(connection);
             
             connection.player.username = dataUsername;
-            API.updatePlayer(connection.player.id, { "username": dataUsername }).catch(err => console.error(err));
         });
 
         socket.on("fireBullet", function (unityData) {
@@ -64,30 +62,40 @@ module.exports = class Connection {
 
         socket.on("sendMessage", function(message){
 
+            console.log(message);
             const message_str = message.message;
             console.log(`"Successfully fired event to send message : ${message_str}"`);
             if(message_str !== null){
-                DB_handleMessageSend(connection.player.username, message_str).catch(err => console.error(err));
+                DB_handleMessageSend(connection, connection.player.username, message_str).catch(err => console.error(err));
             }
             else{
                 console.warn("Sent message was empty");
             }
         })
 
-        socket.on("newMessage", () => {
-            console.log("A message has been sent by another user.");
+        socket.on("getMessages", () => {
+            API.getMessages().then(DB_Messages => {
+                const payload = {
+                    messages : []
+                };
 
-            DB_handleNewMessage().catch(err => console.error(err));
+                if(DB_Messages){
+                    for(let curMes = 0; curMes < DB_Messages.length; curMes++){
+
+                        const message_str = `${DB_Messages[curMes].username} : ${DB_Messages[curMes].message}`;
+
+                        payload.messages.push(message_str);
+                    }
+
+                    console.log(payload);
+                    console.log("^^payload");
+
+                    connection.socket.emit("returnMessages", payload);
+                }else{
+                    console.warn("Could not find any messages");
+                }
+            }).catch(err => console.error(err));
         })
-
-        //If we do NOT have a DB reference, create one.
-        DB_checkRef(connection.player.id).then((foundRef) => {
-            if (!foundRef) {
-                API.createPlayer(connection.player.username, connection.player.id)
-                    .then(creationInfo => console.log(creationInfo))
-                    .catch(error => console.error(error));
-            }
-        }).catch(err => console.log(err));
     }
 }
 
@@ -106,8 +114,27 @@ function DB_handleUserByTokenFetch(connection = Connection, accessToken = String
     return new Promise((resolve, reject) => {
         API.getUserByToken(accessToken).then((DB_User) => {
 
+            //If we found a user, then...
             if (DB_User) {
+                connection.player.username = DB_User.username;
+
+                //If we do NOT have a DB reference, create one.
+                DB_checkRef(connection.player.username).then((foundRef) => {
+                    if (!foundRef) {
+                        API.createPlayer(connection.player.username, connection.player.id)
+                            .then(creationInfo => console.log(creationInfo))
+                            .catch(error => console.error(error));
+                    }else{
+                        API.updatePlayer(connection.player.username, {connection_id : connection.player.id})
+                        .then(updateInfo => console.log(updateInfo))
+                        .catch(err => console.error(err));
+                    }
+                }).catch(err => console.log(err));
+                
+                //Emit the user data now that we've found the user.
                 connection.socket.emit("sendUserFromToken", DB_User);
+
+                //Return true.
                 resolve(true);
             }
             else {
@@ -123,7 +150,7 @@ function DB_handleUserByTokenFetch(connection = Connection, accessToken = String
     })
 }
 
-function DB_handleMessageSend(username, message){
+function DB_handleMessageSend(connection = Connection, username = String, message = String){
     return new Promise((resolve, reject) => {
         API.sendMessage(username, message).then(creationInfo => {
             console.log(creationInfo);
@@ -131,6 +158,10 @@ function DB_handleMessageSend(username, message){
             //Do something now that we've sent the message.
             //Emit broadcast that a message has been sent.
             console.log("Emit broadcast that a message has been sent");
+
+            connection.socket.broadcast.emit("newMessage");
+            connection.socket.emit("newMessage");
+
             resolve(true);
 
         }).catch(err => {
@@ -142,19 +173,6 @@ function DB_handleMessageSend(username, message){
     })
 }
 
-function DB_handleNewMessage(){
-    return new Promise((resolve, reject) => {
-        API.getMessages().then(DB_Messages => {
-            //Do something here now that we have the messages.
-            console.log("Emit to self that we have new messages... Unity will need a listen for this");
-        }).catch(err => {
-            console.error("Could not get messages");
-
-            reject(err);
-        })
-    })
-}
-
 
 /*---------------------------*/
 /*----- CHECK METHODS -----*/
@@ -162,13 +180,13 @@ function DB_handleNewMessage(){
 
 /**
  * This checks if our MongoDB has a stored reference of this connection
- * @param {String} playerID - The ID of our connected player (connection.player.id)
+ * @param {String} username - The username of our connected player (connection.player.username)
  * @returns - Returns promise true/false if reference is found.
  */
-function DB_checkRef(playerID = String) {
+function DB_checkRef(username = String) {
     return new Promise((resolve, reject) => {
 
-        API.getPlayer(playerID).then((DB_playerData) => {
+        API.getPlayer(username).then((DB_playerData) => {
             if (DB_playerData) {
                 resolve(true);
             }
