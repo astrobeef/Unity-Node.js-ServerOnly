@@ -1,12 +1,11 @@
 const db = require("../../models");
 
 module.exports = {
-    getPlayer: function (playerID) {
+    getPlayer: function (username) {
 
         return new Promise(function (resolve, reject) {
 
-            db.Player.find({ connection_id: playerID }, (err, data) => {
-
+            db.Player.find({ username: username }, (err, data) => {
                 if (err) {
                     reject(err);
                 }
@@ -22,19 +21,19 @@ module.exports = {
     },
     /**
      * Updates data on the player MongoDB reference, if found.
-     * @param {String} playerID - The ID of the player we are trying to get.
+     * @param {String} username - The username of the player we are trying to get.
      * @param {Object} alterData - The data to be altered on the collection.
      * @returns nothing, unless there's an error.
      */
-    updatePlayer: function (playerID, alterData) {
+    updatePlayer: function (username, alterData) {
 
         return new Promise(function (resolve, reject) {
 
             db.Player.update(
-                { connection_id: playerID },
+                { username: username },
                 { $set: alterData }
-            ).then((data) => {
-                resolve(data);
+            ).then((updateInfo) => {
+                resolve(updateInfo);
             }).catch((err) => {
                 reject(err);
             });
@@ -88,6 +87,33 @@ module.exports = {
             }).then((deletionInfo) => {
                 console.log(`"Removed reference to the player, ${playerID}"`);
                 resolve(deletionInfo);
+            }).catch(err => reject(err));
+        })
+    },
+    sendMessage: function(username, message){
+        return new Promise((resolve, reject) => {
+
+            if(typeof(message) !== "string" || typeof(username) !== "string"){
+                reject(`ERROR : "Message, ${message}, was not of type 'string'"`);
+            }
+
+            db.Messages.create({
+                username : username,
+                message : message
+            }).then((creationInfo) => {
+                resolve(creationInfo);
+            }).catch(err => reject(err));
+        })
+    },
+    getMessages: function(){
+        return new Promise((resolve, reject) => {
+            db.Messages.find({})
+            .then((DB_Messages) => {
+                if(DB_Messages.length > 0){
+                    resolve(DB_Messages);
+                }else{
+                    resolve(false);
+                }
             }).catch(err => reject(err));
         })
     }
