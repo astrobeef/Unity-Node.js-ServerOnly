@@ -1,0 +1,9 @@
+{
+	"auth": {
+		"webgameserver72e0e6e2": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": []
+		}
+	}
+}

@@ -2,12 +2,12 @@
 
 const awsmobile = {
     "aws_project_region": "us-west-2",
-    "aws_cognito_identity_pool_id": "us-west-2:86736dd0-37e3-40b1-855c-74b662e25a2b",
+    "aws_cognito_identity_pool_id": "us-west-2:66178f88-a392-417e-90cb-6fa706ef3de7",
     "aws_cognito_region": "us-west-2",
-    "aws_user_pools_id": "us-west-2_NMn2yeWJ4",
-    "aws_user_pools_web_client_id": "58loi7nseg85g322jcphun0ql9",
+    "aws_user_pools_id": "us-west-2_isUJEGuUy",
+    "aws_user_pools_web_client_id": "ubpp0n1lk23rgadv0qb23eegq",
     "oauth": {
-        "domain": "unitynodeauth8acddaf0-8acddaf0-local.auth.us-west-2.amazoncognito.com",
+        "domain": "confirmation-local.auth.us-west-2.amazoncognito.com",
         "scope": [
             "phone",
             "email",
@@ -15,8 +15,8 @@ const awsmobile = {
             "profile",
             "aws.cognito.signin.user.admin"
         ],
-        "redirectSignIn": "http://localhost:3000/",
-        "redirectSignOut": "http://localhost:3000/",
+        "redirectSignIn": "https://unity-node-game-server.herokuapp.com/",
+        "redirectSignOut": "https://unity-node-game-server.herokuapp.com/",
         "responseType": "code"
     },
     "federationTarget": "COGNITO_USER_POOLS"

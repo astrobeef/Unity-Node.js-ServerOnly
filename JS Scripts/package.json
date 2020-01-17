@@ -1,0 +1,33 @@
+{
+  "name": "gameserver",
+  "version": "1.0.0",
+  "description": "A game server using Node.js communicating with Unity",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
+    "start:prod": "node server.js",
+    "start:dev": "concurrently \"nodemon --ignore 'client/*'\" \"npm run client\"",
+    "client": "cd client && npm run start",
+    "build": "if-env NODE_ENV=development && cd client && npm run build",
+    "install": "cd client && npm install",
+    "heroku-postbuild": "npm run build"
+  },
+  "author": "Brian Graf (AstroBeef)",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "if-env": "^1.0.4",
+    "mongojs": "^3.1.0",
+    "mongoose": "^5.8.3",
+    "morgan": "^1.9.1",
+    "nodemon": "^2.0.2",
+    "react-router-dom": "^5.1.2",
+    "shortid": "^2.2.15",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.2"
+  }
+}

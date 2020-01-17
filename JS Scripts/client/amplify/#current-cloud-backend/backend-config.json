@@ -1,9 +1,0 @@
-{
-	"auth": {
-		"unitynodeauth8acddaf0": {
-			"service": "Cognito",
-			"providerPlugin": "awscloudformation",
-			"dependsOn": []
-		}
-	}
-}

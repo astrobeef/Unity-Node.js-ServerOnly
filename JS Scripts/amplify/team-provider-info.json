@@ -1,0 +1,22 @@
+{
+    "local": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-webgameserver-local-205814-authRole",
+            "UnauthRoleArn": "arn:aws:iam::658095472941:role/amplify-webgameserver-local-205814-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::658095472941:role/amplify-webgameserver-local-205814-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "amplify-webgameserver-local-205814-deployment",
+            "UnauthRoleName": "amplify-webgameserver-local-205814-unauthRole",
+            "StackName": "amplify-webgameserver-local-205814",
+            "StackId": "arn:aws:cloudformation:us-west-2:658095472941:stack/amplify-webgameserver-local-205814/97b91b00-38dd-11ea-874f-06287158ecd0",
+            "AmplifyAppId": "d21ohm71mxapzw"
+        },
+        "categories": {
+            "auth": {
+                "webgameserver72e0e6e2": {
+                    "hostedUIProviderCreds": "[]"
+                }
+            }
+        }
+    }
+}
