@@ -81,13 +81,19 @@ function App() {
 
     event.persist();
 
+    console.log(connection.accessToken);
+
     if (!connection.accessToken) {
       AUTHO_SetAccessToken(loginInfo.username, event);
     }
     else {
       console.log("Now that's efficency!");
       handleCopyAccessToken(event.target, connection.accessToken);
+      console.log(loginInfo.username);
+      DB_updateUser(loginInfo.username, {accessToken : connection.accessToken});
     }
+
+
   }
 
   //Return the render content for the web page.
@@ -563,9 +569,10 @@ function App() {
 
       setConnection({ ...connection, "accessToken": accessToken });
 
+      DB_registerUser(username);
+
       DB_updateUser(username, { accessToken });
 
-      DB_registerUser(username);
 
       if (event.target) {
         handleCopyAccessToken(event.target, accessToken);
